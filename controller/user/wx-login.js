@@ -1,6 +1,5 @@
 const request = require('request')
 const Users = require('../../models/Users')
-const Students = require('../../models/Students')
 const { AppID, AppSecret } = require('../../config/config')
 const WXBizDataCrypt = require('../../utils/WXBizDataCrypt')
 
@@ -94,7 +93,7 @@ const updateUserInfo = async (ctx) => {
 
 // 获取用户信息
 const getUserInfo = async (ctx) => {
-  const { openid, session_key, username } = ctx.session
+  const { openid, session_key } = ctx.session
   if (!(openid && session_key)) {
     ctx.body = {
       data: {
@@ -104,34 +103,10 @@ const getUserInfo = async (ctx) => {
     }
     return
   }
-  let studentInfo = {
-    username,
-  }
-  if (!username) {
-    const user = await Users.findOne({
-      openid,
-    }).populate({ path: 'student' })
-    const student = user.student
-    if (student) {
-      ctx.session.username = student.username
-      studentInfo = {
-        username: student.username,
-        name: student.name,
-      }
-    }
-  } else {
-    const student = await Students.findOne({
-      username,
-    })
-    if (student) {
-      studentInfo.name = student.name
-    }
-    // console.log(student, student.name)
-  }
+
   ctx.body = {
     data: {
       isLogin: !!(ctx.session.openid && ctx.session.session_key),
-      studentInfo,
     },
     status: 200,
   }

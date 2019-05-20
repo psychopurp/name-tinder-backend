@@ -35,6 +35,7 @@
     "moment": "^2.22.2",
     "mongoose": "^5.2.8",
     "node-qiniu": "^6.2.0",
+    "node-xlsx": "^0.15.0",
     "node-xml2json": "^1.0.0",
     "pug": "^2.0.0-rc.1",
     "request": "^2.88.0",
