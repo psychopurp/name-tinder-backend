@@ -1,0 +1,52 @@
+{
+  "name": "nameTinderBackend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "node bin/www",
+    "dev": "DEBUG=backend*, ./node_modules/.bin/nodemon --delay 1 bin/www",
+    "pro": "pm2 startOrRestart ecosystem.json",
+    "python": "cd python && pm2 start server.py --interpreter=python3",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint --fix ./"
+  },
+  "pre-commit": [
+    "lint"
+  ],
+  "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
+    "crypto": "^1.0.1",
+    "debug": "^2.6.3",
+    "ejs": "^2.6.1",
+    "koa": "^2.2.0",
+    "koa-better-body": "^3.0.4",
+    "koa-bodyparser": "^3.2.0",
+    "koa-convert": "^1.2.0",
+    "koa-generic-session-mongo": "^0.4.0",
+    "koa-json": "^2.0.2",
+    "koa-logger": "^2.0.1",
+    "koa-onerror": "^1.2.1",
+    "koa-proxies": "^0.8.1",
+    "koa-router": "^7.1.1",
+    "koa-session": "^5.9.0",
+    "koa-session-minimal": "^3.0.4",
+    "koa-static": "^3.0.0",
+    "koa-views": "^5.2.1",
+    "moment": "^2.22.2",
+    "mongoose": "^5.2.8",
+    "node-qiniu": "^6.2.0",
+    "node-xml2json": "^1.0.0",
+    "pug": "^2.0.0-rc.1",
+    "request": "^2.88.0",
+    "superagent": "^3.8.3",
+    "superagent-charset": "^1.2.0",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "eslint": "^5.3.0",
+    "eslint-config-airbnb-base": "^13.1.0",
+    "eslint-plugin-import": "^2.14.0",
+    "nodemon": "^1.8.1",
+    "pre-commit": "^1.2.2"
+  }
+}
