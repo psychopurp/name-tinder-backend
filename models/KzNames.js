@@ -7,9 +7,18 @@ const mongoose = require('mongoose')
 // const Schema = mongoose.Schema
 
 const KzNamesSchema = new mongoose.Schema({
-  en_name: String,
-  name: String,
-  gender: Number, // 0: 男 1：女
+  en_name: {
+    type: String,
+    required: true,
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  gender: {
+    type: Number, // 0: 男 1：女
+    required: true,
+  },
 }, {
   timestamps: true,
 })
