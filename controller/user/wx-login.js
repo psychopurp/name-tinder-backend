@@ -23,6 +23,7 @@ const getWxAuthorization = (code) => {
 
 const wxLogin = async (ctx) => {
   const { code } = ctx.request.query
+  // console.log(code)
   if (!code) ctx.throw(401, 'no jscode')
   try {
     // 微信鉴权
@@ -52,18 +53,33 @@ const wxLogin = async (ctx) => {
   }
 }
 
-// 更新用户信息：头像、名字等
+// 更新用户信息：头像、名字、配置等
 const updateUserInfo = async (ctx) => {
-  const { userInfo } = ctx.request.body
-  const data = JSON.parse(userInfo)
+  const { userInfo, config } = ctx.request.fields
   const { openid, session_key } = ctx.session
-  const iv = data.iv
 
-  const pc = new WXBizDataCrypt(AppID, session_key)
-  const wxData = pc.decryptData(data.encryptedData, iv)
-  // console.log('解密后 data: ', d)
-  if (wxData.openId !== openid) {
-    ctx.throw(400, '非当前账号，更新用户信息失败')
+  const updateData = {}
+
+  if (userInfo) {
+    // 签名校验逻辑
+    if (userInfo.encryptedData) {
+      // 更新 userinfo
+      const iv = userInfo.iv
+      const pc = new WXBizDataCrypt(AppID, session_key)
+      const wxData = pc.decryptData(userInfo.encryptedData, iv)
+      // console.log('解密后 data: ', d)
+      if (wxData.openId !== openid) {
+        ctx.throw(400, '非当前账号，更新用户信息失败')
+      }
+      updateData.userInfo = wxData
+    } else {
+      updateData.userInfo = userInfo.userInfo
+    }
+  } else if (config) {
+    // 更新config
+    updateData.config = config
+  } else {
+    ctx.throw(400, '参数不正确')
   }
 
   try {
@@ -78,7 +94,7 @@ const updateUserInfo = async (ctx) => {
     }, {
       openid,
       session_key,
-      userInfo: wxData,
+      ...updateData,
     }, {
       upsert: true,
     })
