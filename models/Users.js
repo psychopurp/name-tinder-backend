@@ -4,7 +4,7 @@
 
 const mongoose = require('mongoose')
 
-// const Schema = mongoose.Schema
+const Schema = mongoose.Schema
 
 const UserSchema = new mongoose.Schema({
   openid: {
@@ -34,6 +34,23 @@ const UserSchema = new mongoose.Schema({
     id: String,
     name: String,
     category: '',
+  },
+  // 配置
+  config: {
+    type: {
+      type: Number, // 0: KzName 1: ZhName
+      required: true,
+    },
+    gender: {
+      type: Number, // 0: 男 1：女 2: 男&女
+      required: true,
+    },
+    lastName: String, // 姓
+  },
+  // 喜欢的组
+  likeGroups: {
+    type: Schema.Types.ObjectId,
+    ref: 'LikeGroups',
   },
 }, {
   timestamps: true,
