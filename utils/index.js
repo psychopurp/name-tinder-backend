@@ -8,7 +8,7 @@ let sessionSecret = 'test'
 
 if (PRODUCTION) {
   const { mongo } = config
-  mongodb = `mongodb://${mongo.user}:${mongo.password}@${mongo.host}:${mongo.port}/${mongo.database}?authSource=${mongo.authSource}`;
+  mongodb = `mongodb://${mongo.user}:${encodeURIComponent(mongo.password)}@${mongo.host}:${mongo.port}/${mongo.database}?authSource=${mongo.authSource}`;
   ({ sessionSecret } = config)
 }
 
