@@ -1,11 +1,22 @@
 const router = require('koa-router')()
-// const {
-//   media,
-// } = require('../controller/other/media')
+const {
+  getNames,
+} = require('../controller/other/name')
 
-// router.prefix('/api')
+const {
+  createGroups,
+  exitGroup,
+  joinGroup,
+  getGroupDetail,
+} = require('../controller/other/groups')
 
-// // 上传文件接口 七牛云
-// router.post('/media', ctx => media(ctx))
+router.prefix('/api')
+
+router.get('/names', ctx => getNames(ctx))
+
+router.get('/group/create', ctx => createGroups(ctx))
+router.get('/group/exit', ctx => exitGroup(ctx))
+router.get('/group/join', ctx => joinGroup(ctx))
+router.get('/group', ctx => getGroupDetail(ctx))
 
 module.exports = router
