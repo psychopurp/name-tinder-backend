@@ -4,10 +4,13 @@
 
 const mongoose = require('mongoose')
 
+const Schema = mongoose.Schema
+
 const LikeGroupsSchema = new mongoose.Schema({
-  group: [{
-    userid: {
-      type: String,
+  users: [{
+    user: {
+      type: Schema.Types.ObjectId,
+      ref: 'Users',
       require: true,
     },
     creator: {
@@ -15,6 +18,7 @@ const LikeGroupsSchema = new mongoose.Schema({
       default: false,
     },
   }],
+  creatorUserId: String,
 }, {
   timestamps: true,
 })

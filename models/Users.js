@@ -30,11 +30,13 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  like: {
-    id: String,
-    name: String,
-    category: '',
-  },
+  likes: [{
+    type: {
+      type: Number, // 0: KzName 1: ZhName
+      required: true,
+    },
+    item: { type: Schema.Types.ObjectId },
+  }],
   // 配置
   config: {
     type: {
@@ -48,10 +50,10 @@ const UserSchema = new mongoose.Schema({
     lastName: String, // 姓
   },
   // 喜欢的组
-  likeGroups: {
+  likeGroups: [{
     type: Schema.Types.ObjectId,
     ref: 'LikeGroups',
-  },
+  }],
 }, {
   timestamps: true,
 })
