@@ -60,6 +60,10 @@ const updateUserInfo = async (ctx) => {
 
   const updateData = {}
 
+  if (!userInfo && !config) {
+    ctx.throw(400, '参数不正确')
+    return
+  }
   if (userInfo) {
     // 签名校验逻辑
     if (userInfo.encryptedData) {
@@ -75,11 +79,10 @@ const updateUserInfo = async (ctx) => {
     } else {
       updateData.userInfo = userInfo.userInfo
     }
-  } else if (config) {
+  }
+  if (config) {
     // 更新config
     updateData.config = config
-  } else {
-    ctx.throw(400, '参数不正确')
   }
 
   try {
@@ -120,11 +123,22 @@ const getUserInfo = async (ctx) => {
     return
   }
 
-  ctx.body = {
-    data: {
-      isLogin: !!(ctx.session.openid && ctx.session.session_key),
-    },
-    status: 200,
+  try {
+    const user = await Users.findOne({
+      openid,
+    }, {
+      config: 1,
+      _id: 0,
+    })
+    ctx.body = {
+      data: {
+        isLogin: !!(ctx.session.openid && ctx.session.session_key),
+        userInfo: user,
+      },
+      status: 200,
+    }
+  } catch (error) {
+    ctx.throw(400, '获取用户信息错误')
   }
 }
 
