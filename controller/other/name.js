@@ -1,4 +1,5 @@
 const KzNames = require('../../models/KzNames')
+const Users = require('../../models/Users')
 
 // 获取微信鉴权
 const getNames = async ctx => {
@@ -27,6 +28,31 @@ const getNames = async ctx => {
   }
 }
 
+// 更新用户信息：头像、名字、配置等
+const likeName = async (ctx) => {
+  const { type, id } = ctx.request.query
+  const { openid } = ctx.session
+
+  try {
+    await Users.findOneAndUpdate({
+      openid,
+    }, {
+      $push: {
+        likes: {
+          type: +type,
+          item: id,
+        },
+      },
+    })
+    ctx.body = {
+      status: 200,
+    }
+  } catch (error) {
+    ctx.throw(400, '添加喜欢失败')
+  }
+}
+
 module.exports = {
   getNames,
+  likeName,
 }
