@@ -1,14 +1,15 @@
 // const KZName = require('./models/KzNames')
 
-// 处理表格数据
+// // console.log(1111)
+// // 处理表格数据
 // function handleExcel () {
 //   const xlsx = require('node-xlsx')
 //   const path = require('path')
 //   // const cetData = require('./util/getTestData').cetData;
 
 //   const list = xlsx.parse(path.resolve('./KZ_Name.xlsx'))
-//   // console.log(list[3].data, 11111)
-//   list[3].data.forEach(async (item, i) => {
+//   console.log(list[0].data.length, 11111)
+//   list[].data.forEach(async (item, i) => {
 //     if (i === 0) {
 //       return
 //     }
@@ -20,19 +21,22 @@
 //     const data = await KZName.findOne({
 //       en_name: enName,
 //     })
+//     console.log(data)
+//     // console.log(data)
 //     if (!enName || !name || data) {
-
+//       return
 //     }
-//     // try {
-//     //   await new KZName({
-//     //     en_name: enName,
-//     //     name,
-//     //     gender: 1,
-//     //   }).save()
-//     // } catch (e) {
-//     //   // 重复数据，略过
-//     //   console.log(e)
-//     // }
+//     try {
+//       await new KZName({
+//         en_name: enName,
+//         name,
+//         gender: 0,
+//       }).save()
+//     } catch (e) {
+//       // 重复数据，略过
+//       // console.log(e)
+//     }
+//     console.log('i:' + i)
 //   })
 //   // KZName
 // }
