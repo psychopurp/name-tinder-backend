@@ -49,7 +49,7 @@ app.use(views(`${__dirname}/views`, {
 app.use(async (ctx, next) => {
   ctx.session.count = ctx.session.count ? ctx.session.count + 1 : 1
   try {
-    if (!ctx.session.openid) {
+    if (!ctx.request.path.includes('/api/user/wx-login') && !ctx.session.openid) {
       // 未登录
       ctx.throw(401, '微信登录失效')
       return
