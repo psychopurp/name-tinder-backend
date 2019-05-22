@@ -123,14 +123,13 @@ const joinGroup = async ctx => {
 
 const getGroupDetail = async ctx => {
   const { id } = ctx.params
-  console.log(id)
   try {
-    const group = await LikeGroups.findById('5ce40fe8550a9a023d312bdc', {
+    const group = await LikeGroups.findById(id, {
       users: 1,
       _id: 0,
     }).populate('users.user')
     ctx.body = {
-      data: group,
+      data: group || {},
       status: 200,
     }
   } catch (error) {
