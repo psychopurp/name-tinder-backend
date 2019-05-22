@@ -6,6 +6,7 @@ const createGroupHander = async openid => {
     openid,
   }, {
     likeGroups: 1,
+    config: 1,
   }).populate('likeGroups')
 
   let id = ''
@@ -65,38 +66,77 @@ const exitGroup = async () => {
 // 加入组
 const joinGroup = async ctx => {
   const { openid } = ctx.session
-  const { groupId } = ctx.query.groupId
+  const { id } = ctx.query
 
-  const group = await LikeGroups.findOne({
-    groupId,
-  })
+  const [user, group] = await Promise.all([
+    await Users.findOne({
+      openid,
+    }, {
+      _id: 1,
+    }),
+    await LikeGroups.findById(id, {
+      users: 1,
+      _id: 0,
+    }),
+  ])
 
-  if (group.users.length >= 2) {
-    console.log(1111)
+  // console.log(user)
+  const existUser = group.users.some(userItem => String(userItem.user) === String(user._id))
+  if (existUser) {
+    ctx.body = {
+      status: 200,
+    }
+    return
   }
-  console.log(group.users)
-  return
-  Promise.all([
+  if (group.users.length >= 2) {
+    ctx.body = {
+      code: 200001, // 组内人数已经满了
+      status: 200,
+    }
+    return
+  }
+
+  await Promise.all([
+    LikeGroups.findByIdAndUpdate(id, {
+      $push: {
+        users: {
+          user,
+        },
+      },
+    }),
     Users.findOneAndUpdate({
       openid,
     }, {
-      $push: { groups: groupId },
+      $push: {
+        likeGroups: group,
+      },
     }),
-    LikeGroups.findOne({
-      groupId,
-    }),
-  ], results => {
-    const user = results[0]
-    const group = results[1]
-    console.warn(user, group)
-  }).catch(() => {
-    ctx.throw(400, '加入组失败')
-  })
+  ])
+
+  ctx.body = {
+    status: 200,
+  }
 }
 
+
+// 5ce40fe8550a9a023d312bdc
+
 const getGroupDetail = async ctx => {
-  const groupId = ctx.query.groupId
-  console.warn(groupId)
+  const { id } = ctx.params
+  console.log(id)
+  try {
+    const group = await LikeGroups.findById('5ce40fe8550a9a023d312bdc', {
+      users: 1,
+      _id: 0,
+    }).populate('users.user')
+    ctx.body = {
+      data: group,
+      status: 200,
+    }
+  } catch (error) {
+    console.log(error)
+    ctx.throw(400, '获取组详情错误')
+  }
 }
 
 const getGroups = async ctx => {
@@ -107,7 +147,7 @@ const getGroups = async ctx => {
       openid,
     }, {
       likeGroups: 1,
-    }).populate('likeGroups').populate('likeGroups.users')
+    }).populate('likeGroups').populate('likeGroups.users.user')
     // console.log(user.likeGroups[0].users)
 
     const id = await createGroupHander(openid)
@@ -120,7 +160,7 @@ const getGroups = async ctx => {
       status: 200,
     }
   } catch (error) {
-    ctx.throw(400, '获取组错误')
+    ctx.throw(400, '获取组列表错误')
   }
 }
 
