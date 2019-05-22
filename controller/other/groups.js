@@ -129,7 +129,7 @@ const getGroupDetail = async ctx => {
       _id: 0,
     }).populate('users.user')
     ctx.body = {
-      data: group || {},
+      data: group,
       status: 200,
     }
   } catch (error) {
@@ -146,7 +146,14 @@ const getGroups = async ctx => {
       openid,
     }, {
       likeGroups: 1,
-    }).populate('likeGroups').populate('likeGroups.users.user')
+    }).populate({
+      path: 'likeGroups',
+      select: 'users',
+      populate: {
+        path: 'users.user',
+        select: 'userInfo',
+      },
+    })
     // console.log(user.likeGroups[0].users)
 
     const id = await createGroupHander(openid)
