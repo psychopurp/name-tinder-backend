@@ -140,6 +140,15 @@ const getGroupDetail = async ctx => {
       },
     })
 
+    if (!group) {
+      // throwServerError(ctx, error, '获取组详情错误')
+      ctx.body = {
+        data: null,
+        status: 200,
+      }
+      return
+    }
+
     const { likes, users } = group.users.reduce((pre, item, index) => {
       const { user: { likes: iLikes, userInfo }, creator } = item
       if (index === 0) {
