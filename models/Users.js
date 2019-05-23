@@ -35,7 +35,11 @@ const UserSchema = new mongoose.Schema({
       type: Number, // 0: KzName 1: ZhName
       required: true,
     },
-    item: { type: Schema.Types.ObjectId },
+    modal: {
+      type: String,
+      required: true,
+    },
+    item: { type: Schema.Types.ObjectId, refPath: 'likes.modal' },
   }],
   // 配置
   config: {
@@ -57,6 +61,29 @@ const UserSchema = new mongoose.Schema({
 }, {
   timestamps: true,
 })
+
+class UserClass {
+  static async findByOpenIdAndAddLikeName (data) {
+    // 查找是否有该用户，如果有添加喜欢的名字 并去重
+    const { openid, likeName: { item }, likeName } = data
+    let user = await this.findOne({
+      openid,
+    })
+    if (
+      user
+      && !user.likes.some(like => String(item) === String(like.item))
+    ) {
+      user.set({
+        ...data,
+        likes: user.likes.concat([likeName]),
+      })
+      const result = await user.save()
+      return result
+    }
+    return null
+  }
+}
+UserSchema.loadClass(UserClass)
 
 const User = mongoose.model('Users', UserSchema)
 
