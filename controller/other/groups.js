@@ -110,11 +110,10 @@ const joinGroup = async ctx => {
       openid,
     }, {
       $push: {
-        likeGroups: group,
+        likeGroups: id,
       },
     }),
   ])
-
   ctx.body = {
     status: 200,
   }
