@@ -154,7 +154,7 @@ const getGroupDetail = async ctx => {
         pre.likes = iLikes
       } else {
         pre.likes = pre.likes
-          .filter(v => iLikes.some(b => String(v._id) === String(b._id)))
+          .filter(v => v.item && iLikes.some(b => String(v._id) === String(b._id)))
           .map(like => like.item)
       }
       pre.users.push({
