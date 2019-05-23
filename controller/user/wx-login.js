@@ -1,7 +1,7 @@
 const request = require('request')
 const Users = require('../../models/Users')
 const { AppID, AppSecret } = require('../../config/config')
-const WXBizDataCrypt = require('../../utils/WXBizDataCrypt')
+// const WXBizDataCrypt = require('../../utils/WXBizDataCrypt')
 
 // 获取微信鉴权
 const getWxAuthorization = (code) => {
@@ -66,19 +66,19 @@ const updateUserInfo = async (ctx) => {
   }
   if (userInfo) {
     // 签名校验逻辑
-    if (userInfo.encryptedData) {
-      // 更新 userinfo
-      const iv = userInfo.iv
-      const pc = new WXBizDataCrypt(AppID, session_key)
-      const wxData = pc.decryptData(userInfo.encryptedData, iv)
-      // console.log('解密后 data: ', d)
-      if (wxData.openId !== openid) {
-        ctx.throw(400, '非当前账号，更新用户信息失败')
-      }
-      updateData.userInfo = wxData
-    } else {
-      updateData.userInfo = userInfo.userInfo
-    }
+    // if (userInfo.encryptedData) {
+    //   // 更新 userinfo
+    //   const iv = userInfo.iv
+    //   const pc = new WXBizDataCrypt(AppID, session_key)
+    //   const wxData = pc.decryptData(userInfo.encryptedData, iv)
+    //   // console.log('解密后 data: ', d)
+    //   if (wxData.openId !== openid) {
+    //     ctx.throw(400, '非当前账号，更新用户信息失败')
+    //   }
+    //   updateData.userInfo = wxData
+    // } else {
+    // }
+    updateData.userInfo = userInfo.userInfo
   }
   if (config) {
     // 更新config
