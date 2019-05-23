@@ -1,7 +1,7 @@
 const LikeGroups = require('../../models/LikeGroups')
 const Users = require('../../models/Users')
 // const KzNames = require('../../models/KzNames')
-const throwServerError = require('../../utils')
+const { throwServerError } = require('../../utils')
 
 const createGroupHander = async openid => {
   const user = await Users.findOne({
