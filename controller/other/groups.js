@@ -1,5 +1,7 @@
 const LikeGroups = require('../../models/LikeGroups')
 const Users = require('../../models/Users')
+// const KzNames = require('../../models/KzNames')
+const throwServerError = require('../../utils')
 
 const createGroupHander = async openid => {
   const user = await Users.findOne({
@@ -127,14 +129,42 @@ const getGroupDetail = async ctx => {
     const group = await LikeGroups.findById(id, {
       users: 1,
       _id: 0,
-    }).populate('users.user')
+    }).populate({
+      path: 'users.user',
+      select: 'likes userInfo',
+    }).populate({
+      path: 'users.user',
+      select: 'likes userInfo',
+      populate: {
+        path: 'likes.item',
+      },
+    })
+
+    const { likes, users } = group.users.reduce((pre, item, index) => {
+      const { user: { likes: iLikes, userInfo } } = item
+      if (index === 0) {
+        pre.likes = iLikes
+      } else {
+        pre.likes = pre.likes
+          .filter(v => iLikes.some(b => String(v._id) === String(b._id)))
+          .map(like => like.item)
+      }
+      pre.users.push(userInfo)
+      return pre
+    }, {
+      likes: [],
+      users: [],
+    })
+
     ctx.body = {
-      data: group,
+      data: {
+        likes,
+        users,
+      },
       status: 200,
     }
   } catch (error) {
-    console.log(error)
-    ctx.throw(400, '获取组详情错误')
+    throwServerError(ctx, error, '获取组详情错误')
   }
 }
 
@@ -151,22 +181,34 @@ const getGroups = async ctx => {
       select: 'users',
       populate: {
         path: 'users.user',
-        select: 'userInfo',
+        select: 'userInfo openid',
       },
     })
     // console.log(user.likeGroups[0].users)
 
     const id = await createGroupHander(openid)
+    const groups = (user._doc.likeGroups || [])
+      .filter(group => group.users.length >= 2)
+      .map(group => ({
+        // ...group._doc,
+        id: group._id,
+        users: group.users.map(guser => ({
+          ...guser.user.userInfo,
+        })),
+        displayUser: (group.users.filter(guser => guser.user.openid !== openid)[0] || { user: {} }).user.userInfo,
+      }))
 
     ctx.body = {
       data: {
-        groups: (user.likeGroups || []).filter(group => group.users.length >= 2),
+        groups,
         selfGroupId: id,
       },
       status: 200,
     }
   } catch (error) {
-    ctx.throw(400, '获取组列表错误')
+    // console.log(error)
+    // ctx.throw(400, '获取组列表错误')
+    throwServerError(ctx, error, '获取组列表错误')
   }
 }
 
