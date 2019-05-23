@@ -65,6 +65,7 @@ app.use(async (ctx, next) => {
       case 406: // Not Acceptable
       case 409: // Conflict
         ctx.status = e.status
+        console.error(e.message)
         ctx.body = {
           message: e.message,
           status: e.status,
