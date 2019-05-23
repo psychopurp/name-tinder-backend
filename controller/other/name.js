@@ -1,6 +1,10 @@
 const KzNames = require('../../models/KzNames')
 const Users = require('../../models/Users')
 
+const MODAL_MAP = {
+  0: 'KzNames',
+  1: 'ZhNames',
+}
 // 获取微信鉴权
 const getNames = async ctx => {
   const { type, gender, lastName } = ctx.query
@@ -34,21 +38,32 @@ const likeName = async (ctx) => {
   const { openid } = ctx.session
 
   try {
-    await Users.findOneAndUpdate({
+    await Users.findByOpenIdAndAddLikeName({
       openid,
-    }, {
-      $push: {
-        likes: {
-          type: +type,
-          item: id,
-        },
+      likeName: {
+        type: +type,
+        item: id,
+        modal: MODAL_MAP[type],
       },
     })
+
+    // await Users.findOneAndUpdate({
+    //   openid,
+    // }, {
+    //   $addToSet: {
+    //     'likes.item': id,
+    //     likes: {
+    //       type: +type,
+    //       item: id,
+    //       modal: MODAL_MAP[type],
+    //     },
+    //   },
+    // })
     ctx.body = {
       status: 200,
     }
   } catch (error) {
-    ctx.throw(400, '添加喜欢失败')
+    ctx.throw(400, `添加喜欢失败: ${error.message}`)
   }
 }
 
