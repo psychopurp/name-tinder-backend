@@ -12,7 +12,12 @@ if (PRODUCTION) {
   ({ sessionSecret } = config)
 }
 
+const throwServerError = (ctx, error, message, errorCode = 400) => {
+  ctx.throw(errorCode, `${error.message}: ${message}`)
+}
+
 module.exports = {
   mongodb,
   sessionSecret,
+  throwServerError,
 }
