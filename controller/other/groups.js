@@ -141,7 +141,7 @@ const getGroupDetail = async ctx => {
     })
 
     const { likes, users } = group.users.reduce((pre, item, index) => {
-      const { user: { likes: iLikes, userInfo } } = item
+      const { user: { likes: iLikes, userInfo }, creator } = item
       if (index === 0) {
         pre.likes = iLikes
       } else {
@@ -149,7 +149,10 @@ const getGroupDetail = async ctx => {
           .filter(v => iLikes.some(b => String(v._id) === String(b._id)))
           .map(like => like.item)
       }
-      pre.users.push(userInfo)
+      pre.users.push({
+        ...userInfo,
+        creator,
+      })
       return pre
     }, {
       likes: [],
