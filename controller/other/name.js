@@ -1,10 +1,17 @@
 const KzNames = require('../../models/KzNames')
+const ZhNames = require('../../models/ZhNames')
 const Users = require('../../models/Users')
 const { getArrayItems, randomInsert } = require('../../utils')
 
 const MODAL_MAP = {
-  0: 'KzNames',
-  1: 'ZhNames',
+  0: {
+    name: 'KzNames',
+    modal: KzNames,
+  },
+  1: {
+    name: 'ZhNames',
+    modal: ZhNames,
+  },
 }
 // 获取微信鉴权
 const getNames = async ctx => {
@@ -63,17 +70,17 @@ const getNames = async ctx => {
 
   let data = []
   // KzName
-  if (+type === 0) {
-    // 随机获取20个名字
-    const options = [{ $match: { gender: +gender } }, { $sample: { size: 20 } }]
-    if (+gender === 2) {
-      options.shift()
-    }
-    data = await KzNames.aggregate(options)
-  } else {
-    console.warn(lastName)
-    // data = await ZhNames.aggregate([{ $match: { gender: +gender } }, { $sample: { size: 20 } }])
+  // 随机获取20个名字
+  const options = [{ $match: { gender: +gender } }, { $sample: { size: 20 } }]
+  if (+gender === 2) {
+    options.shift()
   }
+  data = await MODAL_MAP[type].modal.aggregate(options)
+  // if (+type === 0) {
+  // } else {
+  console.warn(lastName)
+  //   // data = await ZhNames.aggregate([{ $match: { gender: +gender } }, { $sample: { size: 20 } }])
+  // }
   // 随机获取20个名字
   // const data = await KzNames.aggregate([{ $sample: { size: 20 } }])
   // console.log(data)
@@ -94,7 +101,7 @@ const likeName = async (ctx) => {
       likeName: {
         type: +type,
         item: id,
-        modal: MODAL_MAP[type],
+        modal: MODAL_MAP[type].name,
       },
     })
 
