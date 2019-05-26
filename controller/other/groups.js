@@ -153,7 +153,7 @@ const getGroupDetail = async ctx => {
         pre.likes = pre.likes
           .filter(v => v.item && iLikes.some(b => String(v._id) === String(b._id)))
           .map(like => ({
-            ...like.item,
+            ...like.item._doc,
             type: like.type,
           }))
       }
