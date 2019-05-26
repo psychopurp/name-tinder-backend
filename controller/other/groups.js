@@ -131,9 +131,6 @@ const getGroupDetail = async ctx => {
     }).populate({
       path: 'users.user',
       select: 'likes userInfo',
-    }).populate({
-      path: 'users.user',
-      select: 'likes userInfo',
       populate: {
         path: 'likes.item',
       },
@@ -155,7 +152,10 @@ const getGroupDetail = async ctx => {
       } else {
         pre.likes = pre.likes
           .filter(v => v.item && iLikes.some(b => String(v._id) === String(b._id)))
-          .map(like => like.item)
+          .map(like => ({
+            ...like.item,
+            type: like.type,
+          }))
       }
       pre.users.push({
         ...userInfo,
