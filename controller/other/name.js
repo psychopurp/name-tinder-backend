@@ -103,14 +103,12 @@ const findUserLikeNames = async (openid, type) => {
   })
 
   likes = getArrayItems(likes, 4)
-
-  if (likes > 0) {
+  if (likes.length > 0) {
     likes = await MODAL_MAP[type].modal.find({
       _id: { $in: likes },
     })
   }
-  // console.log(likes)
-  return likes
+  return likes.map(like => like._doc)
 }
 // 获取微信鉴权
 const getNames = async ctx => {
@@ -139,13 +137,16 @@ const getNames = async ctx => {
 
   const [names, groupLikeNames = []] = await Promise.all([
     MODAL_MAP[type].modal.aggregate(options),
-    findUserLikeNames(openid, type),
+    findUserLikeNames(openid, type, gender),
   ])
 
   // console.timeEnd(2)
 
   ctx.body = {
-    data: randomInsert(names, groupLikeNames),
+    data: randomInsert(names, groupLikeNames).map(like => ({
+      ...like,
+      type,
+    })),
     status: 200,
   }
 }
