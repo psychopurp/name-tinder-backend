@@ -95,7 +95,7 @@ const findUserLikeNames = async (openid, type) => {
 
   let likes = []
   aUsers.forEach(auser => {
-    auser.likes.forEach(like => {
+    auser.likes && auser.likes.forEach(like => {
       if (!likes.includes(like.item)) {
         likes.push(like.item)
       }
@@ -108,7 +108,10 @@ const findUserLikeNames = async (openid, type) => {
       _id: { $in: likes },
     })
   }
-  return likes.map(like => like._doc)
+  return likes.map(like => ({
+    ...like._doc,
+    otherUser: 1,
+  }))
 }
 // 获取微信鉴权
 const getNames = async ctx => {
