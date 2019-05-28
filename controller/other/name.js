@@ -14,7 +14,7 @@ const MODAL_MAP = {
   },
 }
 
-const findUserLikeNames = async (openid, type) => {
+const findUserLikeNames = async (openid, type, gender) => {
   const userData = await Users.findOne({
     openid,
   }, {
@@ -91,8 +91,22 @@ const findUserLikeNames = async (openid, type) => {
         },
       },
     },
+    {
+      $project: {
+        userInfo: 1,
+        _id: 0,
+        likes: {
+          $filter: {
+            input: '$likes',
+            as: 'item',
+            cond: {
+              $eq: ['$$item.gender', +gender],
+            },
+          },
+        },
+      },
+    },
   ])
-
   let likes = []
   aUsers.forEach(auser => {
     auser.likes && auser.likes.forEach(like => {
@@ -156,31 +170,32 @@ const getNames = async ctx => {
 
 // 更新用户信息：头像、名字、配置等
 const likeName = async (ctx) => {
-  const { type, id } = ctx.request.query
+  const {
+    type,
+    id,
+    name,
+    gender,
+  } = ctx.request.query
   const { openid } = ctx.session
 
   try {
+    const likeNameData = {
+      type: +type,
+      item: id,
+      modal: MODAL_MAP[type].name,
+      gender,
+    }
+
+    // 中文拼接姓
+    if (+type === 1) {
+      likeNameData.name = decodeURIComponent(name)
+    }
+
     await Users.findByOpenIdAndAddLikeName({
       openid,
-      likeName: {
-        type: +type,
-        item: id,
-        modal: MODAL_MAP[type].name,
-      },
+      likeName: likeNameData,
     })
 
-    // await Users.findOneAndUpdate({
-    //   openid,
-    // }, {
-    //   $addToSet: {
-    //     'likes.item': id,
-    //     likes: {
-    //       type: +type,
-    //       item: id,
-    //       modal: MODAL_MAP[type],
-    //     },
-    //   },
-    // })
     ctx.body = {
       status: 200,
     }
