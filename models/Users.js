@@ -33,11 +33,15 @@ const UserSchema = new mongoose.Schema({
   likes: [{
     type: {
       type: Number, // 0: KzName 1: ZhName
-      required: true,
+    },
+    name: {
+      type: String,
+    },
+    gender: {
+      type: Number, // 0: 男 1：女
     },
     modal: {
       type: String,
-      required: true,
     },
     item: { type: Schema.Types.ObjectId, refPath: 'likes.modal' },
   }],
@@ -55,6 +59,10 @@ const UserSchema = new mongoose.Schema({
   },
   // 喜欢的组
   likeGroups: [{
+    isRead: {
+      type: Boolean,
+      default: false,
+    },
     type: Schema.Types.ObjectId,
     ref: 'LikeGroups',
   }],
