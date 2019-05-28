@@ -155,6 +155,7 @@ const getGroupDetail = async ctx => {
           .map(like => ({
             ...like.item._doc,
             type: like.type,
+            name: like.name || like.item.name,
           }))
       }
       pre.users.push({
