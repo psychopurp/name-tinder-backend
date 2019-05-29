@@ -120,11 +120,12 @@ const joinGroup = async ctx => {
 }
 
 
-// 5ce40fe8550a9a023d312bdc
-
+// 获取组详情
 const getGroupDetail = async ctx => {
   const { id } = ctx.params
   try {
+    // 这个地方可以优化，不实用 populate 先筛选共同喜欢名字的id，然后再读库，本期不优化了
+
     const group = await LikeGroups.findById(id, {
       users: 1,
       _id: 0,
@@ -145,18 +146,27 @@ const getGroupDetail = async ctx => {
       return
     }
 
+    // 筛选共同喜欢
     const { likes, users } = group.users.reduce((pre, item, index) => {
       const { user: { likes: iLikes, userInfo }, creator } = item
       if (index === 0) {
-        pre.likes = iLikes
+        pre.likes = iLikes.map(like => ({
+          ...like.item._doc,
+          type: like.type,
+          name: like.name || like.item.name,
+          date: like.createdAt,
+        }))
       } else {
         pre.likes = pre.likes
           .filter(v => v.item && iLikes.some(b => String(v.item._id) === String(b.item._id)))
-          .map(like => ({
-            ...like.item._doc,
-            type: like.type,
-            name: like.name || like.item.name,
-          }))
+          .map(like => {
+            return ({
+              ...like.item._doc,
+              type: like.type,
+              name: like.name || like.item.name,
+              date: like.createdAt,
+            })
+          })
       }
       pre.users.push({
         ...userInfo,
@@ -168,9 +178,10 @@ const getGroupDetail = async ctx => {
       users: [],
     })
 
+    // console.log(likes)
     ctx.body = {
       data: {
-        likes,
+        likes: likes.sort((a, b) => new Date(b.date) - new Date(a.date)),
         users,
       },
       status: 200,
@@ -180,6 +191,7 @@ const getGroupDetail = async ctx => {
   }
 }
 
+// 获取组列表
 const getGroups = async ctx => {
   const { openid } = ctx.session
 
@@ -196,7 +208,6 @@ const getGroups = async ctx => {
         select: 'userInfo openid',
       },
     })
-    // console.log(user.likeGroups[0].users)
 
     const id = await createGroupHander(openid)
     const groups = (user._doc.likeGroups || [])
