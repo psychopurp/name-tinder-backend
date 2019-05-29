@@ -24,47 +24,25 @@ const findUserLikeNames = async (openid, type, gender) => {
     select: 'users',
   })
 
+  /*
+    populate 性能有点低
+    能不使用尽量不使用，先筛出可用数据，再去子表中读取效率提升一倍
+  */
   // .populate({
   //   path: 'likeGroups',
   //   select: 'users',
   //   populate: {
   //     path: 'users.user',
   //     select: 'userInfo openid likes',
-  //     // populate: {
-  //     //   path: 'likes.item',
-  //     // },
+  //     populate: {
+  //       path: 'likes.item',
+  //     },
   //   },
   // })
-  // console.log(userData)
-  // console.log(userData.likeGroups)
-  // console.timeEnd(1)s
+  // console.timeEnd(1)
+
   // 姓名组
   let groupUsers = userData.likeGroups.reduce((userList, likeGroup) => {
-    // console.log(likeGroup)
-    // 姓名组中的user
-    // const users = likeGroup.users.filter(iuser => String(iuser.user) !== String(userData._id))
-    // console.log(users, 'users')
-    // 每个 user 的喜欢的人名
-    // const names = users.reduce((list, user) => {
-    //   return list.concat(
-    //     user.user.likes
-    //       .filter(name => {
-    //         return name.item && name.type === +type
-    //       })
-    //       .map(name => {
-    //         // console.log(name)
-    //         return ({
-    //           _id: name._id,
-    //           type: name.type,
-    //           name: name.item.name,
-    //           en_name: name.item.en_name,
-    //           gender: name.item.gender,
-    //           userInfo: user.user.userInfo,
-    //         })
-    //       })
-    //   )
-    // }, []) || []
-    // console.log(names, 'names')
     likeGroup.users.forEach(user => {
       if (String(user.user) === String(userData._id) || userList.includes(user.user)) {
         return
@@ -138,26 +116,17 @@ const getNames = async ctx => {
   // console.time(1)
   // console.time(2)
 
-  // console.log(groupLikeNames, 111)
-  // groupLikeNames = getArrayItems(groupLikeNames, 4)
-
   // KzName
   // 随机获取20个名字
   const options = [{ $match: { gender: +gender } }, { $sample: { size: 20 } }]
   if (+gender === 2) {
     options.shift()
   }
-  // data = await MODAL_MAP[type].modal.aggregate(options)
-  // if (+type === 0) {
-  // } else {
-  // console.warn(lastName)
 
   const [names, groupLikeNames = []] = await Promise.all([
     MODAL_MAP[type].modal.aggregate(options),
     findUserLikeNames(openid, type, gender),
   ])
-
-  // console.timeEnd(2)
 
   ctx.body = {
     data: randomInsert(names, groupLikeNames).map(like => ({
