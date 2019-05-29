@@ -65,7 +65,7 @@ const updateUserInfo = async (ctx) => {
     return
   }
   if (userInfo) {
-    // 签名校验逻辑
+    // 签名校验逻辑 暂时不需要 先注释掉了
     // if (userInfo.encryptedData) {
     //   // 更新 userinfo
     //   const iv = userInfo.iv

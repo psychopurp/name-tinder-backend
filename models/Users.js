@@ -44,6 +44,7 @@ const UserSchema = new mongoose.Schema({
       type: String,
     },
     item: { type: Schema.Types.ObjectId, refPath: 'likes.modal' },
+    createdAt: { type: Date, default: Date.now },
   }],
   // 配置
   config: {
