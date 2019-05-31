@@ -162,7 +162,7 @@ const getGroupDetail = async ctx => {
           .filter(v => v && iLikes.some(b => String(v._id) === String(b.item._id)))
           .map(like => {
             return ({
-              ...like._doc,
+              ...like,
               type: like.type,
               name: like.name || like.item.name,
               date: like.createdAt,
