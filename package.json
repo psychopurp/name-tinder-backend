@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "node": "nodemon bin/www",
     "start": "DEBUG=backend*, NODE_ENV=production ./node_modules/.bin/nodemon --delay 1 bin/www",
     "dev": "DEBUG=backend*, ./node_modules/.bin/nodemon --delay 1 bin/www",
     "pro": "pm2 startOrRestart ecosystem.json",

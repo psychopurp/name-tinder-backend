@@ -1,28 +1,31 @@
-const KzNames = require('../../models/KzNames')
-const ZhNames = require('../../models/ZhNames')
-const Users = require('../../models/Users')
-const { getArrayItems, randomInsert } = require('../../utils')
+const KzNames = require("../../models/KzNames");
+const ZhNames = require("../../models/ZhNames");
+const Users = require("../../models/Users");
+const { getArrayItems, randomInsert } = require("../../utils");
 
 const MODAL_MAP = {
   0: {
-    name: 'KzNames',
-    modal: KzNames,
+    name: "KzNames",
+    modal: KzNames
   },
   1: {
-    name: 'ZhNames',
-    modal: ZhNames,
-  },
-}
+    name: "ZhNames",
+    modal: ZhNames
+  }
+};
 
 const findUserLikeNames = async (openid, type, gender) => {
-  const userData = await Users.findOne({
-    openid,
-  }, {
-    likeGroups: 1,
-  }).populate({
-    path: 'likeGroups',
-    select: 'users',
-  })
+  const userData = await Users.findOne(
+    {
+      openid
+    },
+    {
+      likeGroups: 1
+    }
+  ).populate({
+    path: "likeGroups",
+    select: "users"
+  });
 
   /*
     populate 性能有点低
@@ -44,13 +47,16 @@ const findUserLikeNames = async (openid, type, gender) => {
   // 姓名组
   let groupUsers = userData.likeGroups.reduce((userList, likeGroup) => {
     likeGroup.users.forEach(user => {
-      if (String(user.user) === String(userData._id) || userList.includes(user.user)) {
-        return
+      if (
+        String(user.user) === String(userData._id) ||
+        userList.includes(user.user)
+      ) {
+        return;
       }
-      userList.push(user.user)
-    })
-    return userList
-  }, [])
+      userList.push(user.user);
+    });
+    return userList;
+  }, []);
 
   const aUsers = await Users.aggregate([
     { $match: { _id: { $in: groupUsers } } },
@@ -60,14 +66,14 @@ const findUserLikeNames = async (openid, type, gender) => {
         _id: 0,
         likes: {
           $filter: {
-            input: '$likes',
-            as: 'item',
+            input: "$likes",
+            as: "item",
             cond: {
-              $eq: ['$$item.type', +type],
-            },
-          },
-        },
-      },
+              $eq: ["$$item.type", +type]
+            }
+          }
+        }
+      }
     },
     {
       $project: {
@@ -75,105 +81,101 @@ const findUserLikeNames = async (openid, type, gender) => {
         _id: 0,
         likes: {
           $filter: {
-            input: '$likes',
-            as: 'item',
+            input: "$likes",
+            as: "item",
             cond: {
-              $eq: ['$$item.gender', +gender],
-            },
-          },
-        },
-      },
-    },
-  ])
-  let likes = []
-  aUsers.forEach(auser => {
-    auser.likes && auser.likes.forEach(like => {
-      if (!likes.includes(like.item)) {
-        likes.push(like.item)
+              $eq: ["$$item.gender", +gender]
+            }
+          }
+        }
       }
-    })
-  })
+    }
+  ]);
+  let likes = [];
+  aUsers.forEach(auser => {
+    auser.likes &&
+      auser.likes.forEach(like => {
+        if (!likes.includes(like.item)) {
+          likes.push(like.item);
+        }
+      });
+  });
 
-  likes = getArrayItems(likes, 4)
+  likes = getArrayItems(likes, 4);
   if (likes.length > 0) {
     likes = await MODAL_MAP[type].modal.find({
-      _id: { $in: likes },
-    })
+      _id: { $in: likes }
+    });
   }
   return likes.map(like => ({
     ...like._doc,
-    otherUser: 1,
-  }))
-}
+    otherUser: 1
+  }));
+};
 // 获取微信鉴权
 const getNames = async ctx => {
   const {
     type,
-    gender,
+    gender
     /* lastName */
-  } = ctx.query
-  const { openid } = ctx.session
+  } = ctx.query;
+  const { openid } = ctx.session;
   // console.time(1)
   // console.time(2)
 
   // KzName
   // 随机获取20个名字
-  const options = [{ $match: { gender: +gender } }, { $sample: { size: 20 } }]
+  const options = [{ $match: { gender: +gender } }, { $sample: { size: 20 } }];
   if (+gender === 2) {
-    options.shift()
+    options.shift();
   }
 
   const [names, groupLikeNames = []] = await Promise.all([
-    MODAL_MAP[type].modal.aggregate(options),
-    findUserLikeNames(openid, type, gender),
-  ])
-
+    MODAL_MAP[type].modal.aggregate(options)
+    // findUserLikeNames(openid, type, gender)
+  ]);
+  console.log(names);
   ctx.body = {
     data: randomInsert(names, groupLikeNames).map(like => ({
       ...like,
-      type,
+      type
     })),
-    status: 200,
-  }
-}
+    status: 200
+  };
+};
 
 // 更新用户信息：头像、名字、配置等
-const likeName = async (ctx) => {
-  const {
-    type,
-    id,
-    name,
-    gender,
-  } = ctx.request.query
-  const { openid } = ctx.session
+const likeName = async ctx => {
+  const { type, id, name, gender } = ctx.request.query;
+  const { openid } = ctx.session;
 
   try {
     const likeNameData = {
       type: +type,
       item: id,
       modal: MODAL_MAP[type].name,
-      gender,
-    }
+      gender
+    };
 
     // 中文拼接姓
     if (+type === 1) {
-      likeNameData.name = decodeURIComponent(name)
+      likeNameData.name = decodeURIComponent(name);
     }
 
     await Users.findByOpenIdAndAddLikeName({
       openid,
-      likeName: likeNameData,
-    })
+      likeName: likeNameData
+    });
 
     ctx.body = {
-      status: 200,
-    }
+      status: 200
+    };
   } catch (error) {
-    ctx.throw(400, `添加喜欢失败: ${error.message}`)
+    ctx.throw(400, `添加喜欢失败: ${error.message}`);
   }
-}
+};
 
 module.exports = {
   getNames,
-  likeName,
-}
+  likeName
+};
