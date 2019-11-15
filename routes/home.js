@@ -4,7 +4,7 @@ router.get("", async ctx => {
   // ctx.response.status = 200;
   ctx.body = {
     status: true,
-    data: "hello koa2 home",
+    data: "hello ! koa2 home ",
     response: ctx.request
   };
 });

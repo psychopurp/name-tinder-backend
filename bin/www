@@ -61,7 +61,7 @@ function debugEr(er) {
 /**
  * Listen on provided port, on all network interfaces.
  */
-
+var DB_URL = "mongodb://database:27017/name-tinder";
 mongoose.Promise = global.Promise;
 mongoose
   .connect(mongodb, { useNewUrlParser: true, useUnifiedTopology: true })

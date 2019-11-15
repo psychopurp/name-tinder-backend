@@ -1,9 +1,11 @@
 {
-  "apps": [{
-    "name": "name-tinder-server",
-    "script": "./bin/www",
-    "env": {
-      "NODE_ENV": "production"
+  "apps": [
+    {
+      "name": "name-tinder-server",
+      "script": "./bin/www",
+      "env": {
+        "NODE_ENV": "production"
+      }
     }
-  }]
+  ]
 }
