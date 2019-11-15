@@ -131,8 +131,8 @@ const getNames = async ctx => {
   }
 
   const [names, groupLikeNames = []] = await Promise.all([
-    MODAL_MAP[type].modal.aggregate(options)
-    // findUserLikeNames(openid, type, gender)
+    MODAL_MAP[type].modal.aggregate(options),
+    findUserLikeNames(openid, type, gender)
   ]);
   console.log(names);
   ctx.body = {

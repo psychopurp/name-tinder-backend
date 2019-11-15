@@ -54,10 +54,13 @@ app.use(
 app.use(async (ctx, next) => {
   ctx.session.count = ctx.session.count ? ctx.session.count + 1 : 1;
   try {
-    // if (!ctx.request.path.includes('/api/user/wx-login') && !ctx.session.openid) {
+    // if (
+    //   !ctx.request.path.includes("/api/user/wx-login") &&
+    //   !ctx.session.openid
+    // ) {
     //   // 未登录
-    //   ctx.throw(401, '微信登录失效')
-    //   return
+    //   ctx.throw(401, "微信登录失效");
+    //   return;
     // }
     await next();
   } catch (e) {
@@ -86,22 +89,28 @@ app.use(async (ctx, next) => {
   }
 });
 
-const routes = {
-  index: require("./routes/index"),
-  // 公共 api
-  user: require("./routes/user"),
-  // 一些公共 api
-  other: require("./routes/other")
-};
+// const routes = {
+//   index: require("./routes/index"),
+//   // 公共 api
+//   user: require("./routes/user"),
+//   // 一些公共 api
+//   other: require("./routes/other")
+
+//   //  新增api
+// };
 
 // routes
 // app.use(index.routes(), index.allowedMethods())
 // app.use(users.routes(), users.allowedMethods())
 
-Object.keys(routes).forEach(key => {
-  const route = routes[key];
-  app.use(route.routes(), route.allowedMethods());
-});
+// Object.keys(routes).forEach(key => {
+//   const route = routes[key];
+//   app.use(route.routes(), route.allowedMethods());
+// });
+const routers = require("./routes/index");
+
+// 初始化路由中间件
+app.use(routers.routes(), routers.allowedMethods());
 
 // error-handling
 app.on("error", (err, ctx) => {
