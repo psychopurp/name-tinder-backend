@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "node": "nodemon bin/www",
+    "dev_elyar": "cross-env NODE_ENV=test nodemon bin/www",
     "start": "DEBUG=backend*, NODE_ENV=production ./node_modules/.bin/nodemon --delay 1 bin/www",
     "dev": "DEBUG=backend*, ./node_modules/.bin/nodemon --delay 1 bin/www",
     "pro": "pm2 startOrRestart ecosystem.json",
@@ -45,6 +46,7 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
+    "cross-env": "^6.0.3",
     "eslint": "^5.3.0",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.14.0",

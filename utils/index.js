@@ -2,8 +2,13 @@
 const config = require("../config/config");
 
 const PRODUCTION = process.env.NODE_ENV === "production";
+const DEV = process.env.NODE_ENV === "test";
 
 let mongodb = "mongodb://name-mongo:27017/name-tinder";
+if (DEV) {
+  mongodb = "mongodb://127.0.0.1:27017/name-tinder";
+}
+console.log(mongodb);
 let sessionSecret = "test";
 
 if (PRODUCTION) {

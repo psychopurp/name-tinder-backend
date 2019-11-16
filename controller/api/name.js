@@ -4,14 +4,31 @@ const ZhNameModel = require("../../models/zh_name_model");
 
 // mongoose.connect("mongodb://127.0.0.1:27017/name-tinder");
 
+const MODAL_MAP = {
+  0: {
+    name: "KzNames",
+    model: KzNameModel
+  },
+  1: {
+    name: "ZhNames",
+    model: ZhNameModel
+  }
+};
+
 const getName = async ctx => {
-  let query = ctx.query;
+  const { type, gender, lastName } = ctx.query;
+
   let status;
   let data;
   try {
-    let nameList = await ZhNameModel.find({ is_double_name: true })
+    let nameList = await MODAL_MAP[type].model
+      .find({ gender })
       .limit(30)
       .exec();
+
+    nameList.forEach(item => {
+      item.name = lastName + item.name;
+    });
     data = nameList;
     status = true;
     console.log("getname.....");
@@ -22,7 +39,6 @@ const getName = async ctx => {
   }
   let len = data.length;
   ctx.body = {
-    // data.length,
     status,
     data,
     len
