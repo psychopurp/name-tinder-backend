@@ -48,8 +48,8 @@ const findUserLikeNames = async (openid, type, gender) => {
   let groupUsers = userData.likeGroups.reduce((userList, likeGroup) => {
     likeGroup.users.forEach(user => {
       if (
-        String(user.user) === String(userData._id) ||
-        userList.includes(user.user)
+        String(user.user) === String(userData._id)
+        || userList.includes(user.user)
       ) {
         return;
       }
@@ -93,8 +93,8 @@ const findUserLikeNames = async (openid, type, gender) => {
   ]);
   let likes = [];
   aUsers.forEach(auser => {
-    auser.likes &&
-      auser.likes.forEach(like => {
+    auser.likes
+      && auser.likes.forEach(like => {
         if (!likes.includes(like.item)) {
           likes.push(like.item);
         }
@@ -146,7 +146,9 @@ const getNames = async ctx => {
 
 // 更新用户信息：头像、名字、配置等
 const likeName = async ctx => {
-  const { type, id, name, gender } = ctx.request.query;
+  const {
+    type, id, name, gender
+  } = ctx.request.query;
   const { openid } = ctx.session;
 
   try {
