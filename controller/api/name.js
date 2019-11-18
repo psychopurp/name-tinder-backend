@@ -16,7 +16,7 @@ const MODAL_MAP = {
 };
 
 const getName = async ctx => {
-  const { type, gender, lastName } = ctx.query;
+  const { type, gender } = ctx.query;
 
   let status;
   let data;
@@ -26,9 +26,6 @@ const getName = async ctx => {
       .limit(30)
       .exec();
 
-    nameList.forEach(item => {
-      item.name = lastName + item.name;
-    });
     data = nameList;
     status = true;
     console.log("getname.....");
