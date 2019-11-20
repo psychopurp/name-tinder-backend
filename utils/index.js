@@ -2,11 +2,11 @@
 const config = require("../config/config");
 
 const PRODUCTION = process.env.NODE_ENV === "production";
-const DEV = process.env.NODE_ENV === "test";
+const DOCKER = process.env.NODE_ENV === "docker";
 
-let mongodb = "mongodb://name-mongo:27017/name-tinder";
-if (DEV) {
-  mongodb = "mongodb://127.0.0.1:27017/name-tinder";
+let mongodb = "mongodb://127.0.0.1:27017/name-tinder";
+if (DOCKER) {
+  mongodb = "mongodb://name-mongo:27017/name-tinder";
 }
 console.log(mongodb);
 let sessionSecret = "test";
@@ -15,7 +15,7 @@ if (PRODUCTION) {
   const { mongo } = config;
   mongodb = `mongodb://${mongo.user}:${encodeURIComponent(mongo.password)}@${
     mongo.host
-  }:${mongo.port}/${mongo.database}?authSource=${mongo.authSource}`;
+    }:${mongo.port}/${mongo.database}?authSource=${mongo.authSource}`;
   ({ sessionSecret } = config);
 }
 
