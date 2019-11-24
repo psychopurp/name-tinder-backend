@@ -12,9 +12,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint --fix ./"
   },
-  "pre-commit": [
-    "lint"
-  ],
+  // "pre-commit": [
+  //   "lint"
+  // ],
   "dependencies": {
     "cheerio": "^1.0.0-rc.2",
     "crypto": "^1.0.1",
