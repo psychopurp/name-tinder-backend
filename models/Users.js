@@ -72,7 +72,7 @@ const UserSchema = new mongoose.Schema({
 })
 
 class UserClass {
-  static async findByOpenIdAndAddLikeName (data) {
+  static async findByOpenIdAndAddLikeName(data) {
     // 查找是否有该用户，如果有添加喜欢的名字 并去重
     const { openid, likeName: { item }, likeName } = data
     let user = await this.findOne({
@@ -93,7 +93,17 @@ class UserClass {
   }
 }
 UserSchema.loadClass(UserClass)
-
+UserSchema.statics.findByOpenid = async function (openid) {
+  try {
+    let user = await this.findOne({ openid })
+    if (user == null) {
+      return { status: false, msg: 'this user not exist', user: null }
+    }
+    return { status: true, msg: 'ok', user: user }
+  } catch (error) {
+    return { status: false, msg: error.toString(), user: null }
+  }
+}
 const User = mongoose.model('Users', UserSchema)
 
 module.exports = User

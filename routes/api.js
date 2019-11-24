@@ -1,7 +1,11 @@
+/* eslint-disable indent */
 const router = require("koa-router")();
 const NameController = require("../controller/api/name");
 
 router.get("/names", NameController.getName);
+
+router.post("/likeName", NameController.addLikeName)
+router.get('/LikeName', NameController.getLikeName)
 // router.put('/name/like', ctx => likeName(ctx))
 
 // router.get('/group/create', ctx => createGroups(ctx))
