@@ -54,13 +54,13 @@ const addLikeName = async ctx => {
   let fields = ctx.request.fields
   let { token } = ctx.header
   let openid = token
-  let { nameId, isLike, nameType, lastName } = ctx.request.fields
+  let { nameId, isLike, lastName } = ctx.request.fields
   try {
     let userData = await UserModel.findByOpenid(openid)
     let { likes, msg } = await LikesModel.findOrCreate(userData.user.id)
     msgGlobal = msg
     if (likes != null) {
-      let result = await likes.addLike(nameId, isLike, nameType, lastName)
+      let result = await likes.addLike(nameId, isLike, lastName)
       status = result.status
       msgGlobal = result.msg
     } else {
@@ -109,4 +109,38 @@ const getLikeName = async ctx => {
     msg,
   };
 }
-module.exports = { getName, addLikeName, getLikeName };
+
+const getCommonLikes = async ctx => {
+  let status;
+  let msgGlobal = ""
+  let data = null
+  let { token } = ctx.header
+  let { userId, nameType, gender } = ctx.request.fields
+  let openid = token
+  try {
+    result = await UserModel.findByOpenid(openid)
+    if (!result.status) {
+      msgGlobal = result.msg
+      status = result.status
+    } else {
+      let user = result.user
+      let likes = (await LikesModel.findOrCreate(user.id)).likes
+      // console.log(likes);
+      let nameList = await likes.getCommonLikes(userId, nameType, gender)
+      // console.log(user);
+      status = true
+      // data = likes.likes
+      msgGlobal = msg
+    }
+  } catch (error) {
+    status = false;
+    msgGlobal = error.toString()
+  }
+  msg = msgGlobal
+  ctx.body = {
+    status,
+    data,
+    msg,
+  };
+}
+module.exports = { getName, addLikeName, getLikeName, getCommonLikes };

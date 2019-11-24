@@ -25,7 +25,6 @@ const KzNamesSchema = new mongoose.Schema(
       type: String,
       trim: true
     },
-    id: { type: Number }
   },
   { timestamps: true }
 );

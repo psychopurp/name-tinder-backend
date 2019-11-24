@@ -68,15 +68,18 @@ LikesSchema.statics.findOrCreate = async function (userId) {
     }
 };
 
-LikesSchema.methods.addLike = async function (nameId, isLike, nameType, lastName = '') {
+LikesSchema.methods.addLike = async function (nameId, isLike, lastName = '') {
     try {
-        let nameModel = await MODAL_MAP[nameType].model.findById(nameId);
+        let kzName = await KzNameModel.findById(nameId);
+        let ZhName = await ZhNameModel.findById(nameId);
+        let model = (kzName == null) ? ZhName : kzName
+        let type = (kzName == null) ? 1 : 0
         let data = {
-            type: nameType,
-            name: nameModel.name,
-            gender: nameModel.gender,
-            model: MODAL_MAP[nameType].name,
-            _id: nameModel._id,
+            type: type,
+            name: model.name,
+            gender: model.gender,
+            model: MODAL_MAP[type].name,
+            _id: model._id,
             lastName: lastName
         }
         if (isLike) {
@@ -86,6 +89,25 @@ LikesSchema.methods.addLike = async function (nameId, isLike, nameType, lastName
         }
         // console.log(this.likes);
         this.save()
+        return { status: true, msg: 'ok' }
+    } catch (error) {
+        console.log(error);
+        return { status: false, msg: error.toString() }
+    }
+};
+
+LikesSchema.methods.getCommonLikes = async function (userId, nameType, gender) {
+    try {
+        let userList = [userId]
+        console.log(userList);
+        console.log(gender);
+        userList.forEach(async (item) => {
+            let likes = await this.model('LikesModel').findOrCreate({ userId: item, 'likes.type': nameType, 'likes.gender': gender })
+            console.log(likes);
+        })
+
+
+
         return { status: true, msg: 'ok' }
     } catch (error) {
         console.log(error);
