@@ -61,7 +61,16 @@ data:
 return :
 {
     status : bool
-    data :[]
+    data :[
+        ///样例
+        {
+        "nameId": "5dcd37beca1fa4c1b99dd764",
+        "name": "Abake",
+        "gender": 1,
+        "lastName": "",
+        "type": 0
+        }
+    ]
 }
 ```
 ## 获取共同喜欢的名字
@@ -74,7 +83,16 @@ data:
 return :
 {
     status : bool
-    data :[]
+    data :[
+        ///样例
+        {
+    "nameId": "5dcd37beca1fa4c1b99dd766",
+    "name": "Abasi",
+    "type": 0,
+    "gender": 1,
+    "lastName": "李"
+        }
+    ]
 }
 ```
 ## 添加好友接口

@@ -119,7 +119,13 @@ const getLikeName = async ctx => {
         msg
       } = await LikesModel.findOrCreate(user.id)
       status = true
-      data = likes.likes
+      data = likes.likes.map((item) => ({
+        nameId: item._id,
+        name: item.name,
+        gender: item.gender,
+        lastName: item.lastName,
+        type: item.type
+      }))
       msgGlobal = msg
     }
   } catch (error) {
@@ -162,7 +168,13 @@ const getCommonLikes = async ctx => {
       let likes = (await LikesModel.findOrCreate(user.id)).likes
       let resultObject = await likes.getCommonLikes(userId, nameType)
       if (resultObject.status) {
-        data = resultObject.data
+        data = resultObject.data.map((item) => ({
+          nameId: item._id,
+          name: item.name,
+          type: item.type,
+          gender: item.gender,
+          lastName: item.lastName
+        }))
         status = true
         msgGlobal = 'ok'
       } else {
