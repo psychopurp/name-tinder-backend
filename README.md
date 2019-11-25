@@ -26,6 +26,7 @@ prefix: api
 
 1.关于名字的接口
 ## 获取名字
+'''
 url: "/api/names"
 method: GET
 queryparam: 
@@ -36,6 +37,7 @@ return :
     status : bool
     data :[]
 }
+'''
 ## 左滑或者右滑
 url: "/api/likeName"
 method: POST
