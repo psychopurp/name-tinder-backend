@@ -2,6 +2,7 @@
 const router = require("koa-router")();
 const NameController = require("../controller/api/name");
 const GroupController = require("../controller/api/group");
+const FriendController = require("../controller/api/friend");
 
 router.get("/names", NameController.getName);
 
@@ -12,6 +13,7 @@ router.post("/getCommonLikes", NameController.getCommonLikes)
 router.post("/group", GroupController.addGroup)
 router.get('/group', GroupController.getGroups)
 
+router.post("/addFriend", FriendController.addFriend)
 // router.put('/name/like', ctx => likeName(ctx))
 
 // router.get('/group/create', ctx => createGroups(ctx))

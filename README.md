@@ -48,6 +48,28 @@ return :
     status : bool
     data :[]
 }
+
+## 获取共同喜欢的名字
+url: "/api/getCommonLikes"
+method: POST
+data: 
+    userId: str  //好友的id
+    nameType: int  //名字类型 0 kz 1 zh
+return :
+{
+    status : bool
+    data :[]
+}
+
+## 添加好友接口
+url: "/api/addFriend"
+method: POST
+data: 
+    userId: str  //好友的id
+return :
+{
+    status : bool
+}
 <!-- router.post("/likeName", NameController.addLikeName)
 router.get('/LikeName', NameController.getLikeName)
 router.post("/getCommonLikes", NameController.getCommonLikes)

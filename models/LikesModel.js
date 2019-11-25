@@ -26,45 +26,55 @@ const ChildSchema = new Schema({
         index: true
     },
     name: String,
-    gender: Number,  // 0: 男女 1：男 2：女
-    type: Number,  // 0: KzName 1: ZhName
+    gender: Number, // 0: 男女 1：男 2：女
+    type: Number, // 0: KzName 1: ZhName
     lastName: String,
     model: String,
-    createdAt: { type: Date, default: Date.now },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
 })
 
-const LikesSchema = new mongoose.Schema(
-    {
-        userId: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true,
-            unique: true,
-            index: true,
-            ref: "Users"
-        },
-        likes: [
-            ChildSchema
-        ],
-        disLikes: [
-            ChildSchema
-        ]
+const LikesSchema = new mongoose.Schema({
+    userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        unique: true,
+        index: true,
+        ref: "Users"
     },
-    {
-        timestamps: true,
-        collection: "Likes"
-    }
-);
+    likes: [
+        ChildSchema
+    ],
+    disLikes: [
+        ChildSchema
+    ]
+}, {
+    timestamps: true,
+    collection: "Likes"
+});
 
 LikesSchema.statics.findOrCreate = async function (userId) {
     try {
-        let user = await this.findOne({ userId })
+        let user = await this.findOne({
+            userId
+        })
         if (user == null) {
-            user = await this.create({ userId })
+            user = await this.create({
+                userId
+            })
         }
-        return { likes: user, msg: 'ok' };
+        return {
+            likes: user,
+            msg: 'ok'
+        };
     } catch (error) {
         console.log(error);
-        return { likes: null, msg: error.toString() };
+        return {
+            likes: null,
+            msg: error.toString()
+        };
     }
 };
 
@@ -89,31 +99,69 @@ LikesSchema.methods.addLike = async function (nameId, isLike, lastName = '') {
         }
         // console.log(this.likes);
         this.save()
-        return { status: true, msg: 'ok' }
+        return {
+            status: true,
+            msg: 'ok'
+        }
     } catch (error) {
         console.log(error);
-        return { status: false, msg: error.toString() }
+        return {
+            status: false,
+            msg: error.toString()
+        }
     }
 };
 
-LikesSchema.methods.getCommonLikes = async function (userId, nameType, gender) {
+LikesSchema.methods.getCommonLikes = async function (userId, nameType) {
     try {
-        let userList = [userId]
-        console.log(userList);
-        console.log(gender);
-        userList.forEach(async (item) => {
-            let likes = await this.model('LikesModel').findOrCreate({ userId: item, 'likes.type': nameType, 'likes.gender': gender })
-            console.log(likes);
-        })
+        ///自己的喜欢列表id
+        let myLikes = this.likes.filter((item) => (item.type == nameType)).map((item) => item.id)
+        // console.log(myLikes);
+        let likes = await this.model('LikesModel').aggregate([{
+                $match: {
+                    userId: new mongoose.Types.ObjectId(userId)
+                }
+            }, {
+                $project: {
+                    _id: 0,
+                    likes: {
+                        $filter: {
+                            input: "$likes",
+                            as: "item",
+                            cond: {
+                                $and: [{
+                                    $eq: ["$$item.type", +nameType]
+                                }],
+                                // $in: ["$$item", likeList]
+                            }
+                        },
+                    }
+                }
+            },
 
+        ])
 
+        let otherLikes = likes[0].likes
+        let commonLikes = otherLikes.filter((item) => (myLikes.includes(item._id))).map((item) => ({
+            id: item._id,
+            name: item.name,
+            type: item.type,
+            gender: item.gender,
+            lastName: item.lastName
+        }))
 
-        return { status: true, msg: 'ok' }
+        // console.log(otherLikes);
+        return {
+            status: true,
+            data: commonLikes
+        }
     } catch (error) {
         console.log(error);
-        return { status: false, msg: error.toString() }
+        return {
+            status: false,
+            msg: error.toString()
+        }
     }
 };
 
-const model = mongoose.model("LikesModel", LikesSchema);
-module.exports = model
+module.exports = mongoose.model("LikesModel", LikesSchema);

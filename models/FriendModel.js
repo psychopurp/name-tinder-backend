@@ -28,36 +28,43 @@ const ChildSchema = new Schema({
         index: true
     },
     name: String,
-    gender: Number,  // 0: 男女 1：男 2：女
-    type: Number,  // 0: KzName 1: ZhName
+    gender: Number, // 0: 男女 1：男 2：女
+    type: Number, // 0: KzName 1: ZhName
     lastName: String,
     model: String,
-    createdAt: { type: Date, default: Date.now },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
 })
 
-const FriendSchema = new mongoose.Schema(
-    {
-        _id: {
-            type: mongoose.Schema.Types.ObjectId,
-            required: true,
-            ref: "Users"
-        },
-        members: [{ type: Schema.Types.ObjectId, ref: 'Users' }],
-        // commonLikes: [
-        //     ChildSchema
-        // ],
+const FriendSchema = new mongoose.Schema({
+    _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: "Users"
     },
-    {
-        timestamps: true,
-        collection: "Friends"
-    }
-);
+    members: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Users'
+    }],
+    // commonLikes: [
+    //     ChildSchema
+    // ],
+}, {
+    timestamps: true,
+    collection: "Friends"
+});
 
 FriendSchema.statics.findOrCreate = async function (creatorId) {
     try {
-        let user = await this.findById(creatorId)
+        let user = await this.findById(
+            creatorId
+        )
         if (user == null) {
-            user = await this.create({ creatorId })
+            user = await this.create({
+                _id: creatorId
+            })
         }
         return user
     } catch (error) {
@@ -69,38 +76,35 @@ FriendSchema.statics.findOrCreate = async function (creatorId) {
 ///添加好友
 FriendSchema.methods.addFriend = async function (userId) {
     try {
-        this.members.addToSet(userId);
-        let friend = await this.model('FriendModel').findOrCreate(userId)
-        if (friend != null) {
-            friend.members.addToSet(this._id)
-            friend.save()
-            return { status: true, msg: 'ok' }
-        } else {
-            return { status: false, msg: 'add fail to friend' }
+        ///添加到自己列表
+        if (this._id != userId) {
+            this.members.addToSet(userId);
+            this.save()
+            ///添加到对方列表
+            let friend = await this.model('FriendModel').findOrCreate(userId)
+            if (friend != null) {
+                friend.members.addToSet(this._id)
+                friend.save()
+                return {
+                    status: true,
+                    msg: 'ok'
+                }
+            } else {
+                return {
+                    status: false,
+                    msg: 'add fail to friend'
+                }
+            }
         }
     } catch (error) {
         console.log(error);
-        return { status: false, msg: error.toString() }
+        return {
+            status: false,
+            msg: error.toString()
+        }
     }
 };
 
-FriendSchema.methods.getCommonLikes = async function (nameType, gender) {
-    try {
-        let nameSet = new Set();
-        this.members.forEach(async (item) => {
-            console.log(item);
-            let likes = await LikesModel.find({ userId: item, 'likes.type': nameType, 'likes.gender': gender })
-            // let nameList = await likes.likes.fin
-            console.log(likes);
-            // nameSet.add(...nameList)
-        })
 
-        return { status: true, msg: 'ok' }
-    } catch (error) {
-        console.log(error);
-        return { status: false, msg: error.toString() }
-    }
-};
 
-const model = mongoose.model("FriendModel", FriendSchema);
-module.exports = model
+module.exports = mongoose.model("FriendModel", FriendSchema);

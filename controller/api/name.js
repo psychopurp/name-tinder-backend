@@ -1,4 +1,3 @@
-
 const mongoose = require("mongoose");
 const KzNameModel = require("../../models/kz_name_model");
 const ZhNameModel = require("../../models/zh_name_model");
@@ -19,13 +18,18 @@ const MODAL_MAP = {
 };
 
 const getName = async ctx => {
-  const { type, gender } = ctx.query;
+  const {
+    type,
+    gender
+  } = ctx.query;
 
   let status;
   let data;
   try {
     let nameList = await MODAL_MAP[type].model
-      .find({ gender })
+      .find({
+        gender
+      })
       .limit(30)
       .exec();
 
@@ -52,12 +56,21 @@ const addLikeName = async ctx => {
   let status;
   let msgGlobal = ""
   let fields = ctx.request.fields
-  let { token } = ctx.header
+  let {
+    token
+  } = ctx.header
   let openid = token
-  let { nameId, isLike, lastName } = ctx.request.fields
+  let {
+    nameId,
+    isLike,
+    lastName
+  } = ctx.request.fields
   try {
     let userData = await UserModel.findByOpenid(openid)
-    let { likes, msg } = await LikesModel.findOrCreate(userData.user.id)
+    let {
+      likes,
+      msg
+    } = await LikesModel.findOrCreate(userData.user.id)
     msgGlobal = msg
     if (likes != null) {
       let result = await likes.addLike(nameId, isLike, lastName)
@@ -84,7 +97,9 @@ const getLikeName = async ctx => {
   let status;
   let msgGlobal = ""
   let data = null
-  let { token } = ctx.header
+  let {
+    token
+  } = ctx.header
   let openid = token
   try {
     result = await UserModel.findByOpenid(openid)
@@ -93,7 +108,10 @@ const getLikeName = async ctx => {
       status = result.status
     } else {
       let user = result.user
-      let { likes, msg } = await LikesModel.findOrCreate(user.id)
+      let {
+        likes,
+        msg
+      } = await LikesModel.findOrCreate(user.id)
       status = true
       data = likes.likes
       msgGlobal = msg
@@ -110,12 +128,23 @@ const getLikeName = async ctx => {
   };
 }
 
+/**
+ * 获取共同喜欢名字列表
+ * @param {userId,nameType} 
+ * 
+ */
 const getCommonLikes = async ctx => {
   let status;
   let msgGlobal = ""
   let data = null
-  let { token } = ctx.header
-  let { userId, nameType, gender } = ctx.request.fields
+  let {
+    token
+  } = ctx.header
+  let {
+    userId,
+    nameType,
+    gender
+  } = ctx.request.fields
   let openid = token
   try {
     result = await UserModel.findByOpenid(openid)
@@ -125,12 +154,14 @@ const getCommonLikes = async ctx => {
     } else {
       let user = result.user
       let likes = (await LikesModel.findOrCreate(user.id)).likes
-      // console.log(likes);
-      let nameList = await likes.getCommonLikes(userId, nameType, gender)
-      // console.log(user);
-      status = true
-      // data = likes.likes
-      msgGlobal = msg
+      let resultObject = await likes.getCommonLikes(userId, nameType)
+      if (resultObject.status) {
+        data = resultObject.data
+        status = true
+        msgGlobal = 'ok'
+      } else {
+        status = false
+      }
     }
   } catch (error) {
     status = false;
@@ -143,4 +174,9 @@ const getCommonLikes = async ctx => {
     msg,
   };
 }
-module.exports = { getName, addLikeName, getLikeName, getCommonLikes };
+module.exports = {
+  getName,
+  addLikeName,
+  getLikeName,
+  getCommonLikes
+};
