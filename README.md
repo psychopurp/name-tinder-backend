@@ -26,7 +26,7 @@ prefix: api
 
 1.关于名字的接口
 ## 获取名字
-'''
+```
 url: "/api/names"
 method: GET
 queryparam: 
@@ -37,8 +37,9 @@ return :
     status : bool
     data :[]
 }
-'''
+```
 ## 左滑或者右滑
+```
 url: "/api/likeName"
 method: POST
 data: 
@@ -50,19 +51,21 @@ return :
     status : bool
     data :[]
 }
-
+```
 ## 获取喜欢的名字
-- url: "/api/likeName"
--method: GET
--data: 
--    
--return :
--{
--    status : bool
--    data :[]
--}
-
+```
+url: "/api/likeName"
+method: GET
+data: 
+    
+return :
+{
+    status : bool
+    data :[]
+}
+```
 ## 获取共同喜欢的名字
+```
 url: "/api/getCommonLikes"
 method: POST
 data: 
@@ -73,8 +76,9 @@ return :
     status : bool
     data :[]
 }
-
+```
 ## 添加好友接口
+```
 url: "/api/addFriend"
 method: POST
 data: 
@@ -83,6 +87,7 @@ return :
 {
     status : bool
 }
+```
 <!-- router.post("/likeName", NameController.addLikeName)
 router.get('/LikeName', NameController.getLikeName)
 router.post("/getCommonLikes", NameController.getCommonLikes)
