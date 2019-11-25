@@ -32,10 +32,22 @@ method: GET
 queryparam: 
     type : int  //0 kz  //1 zh
     gender : int  // 1 boy  2 girl
+    friendId : str
+    lastName : str
 return :
 {
     status : bool
-    data :[]
+    len: int 
+    data :[
+        ///样例
+        {
+        "name": "华荣",
+        "gender": 0,
+        "explanation": "繁荣。",
+        "source": "典籍出处：汉 焦赣《易林·复之解》：“春桃萌生，万物华荣，邦君所居，国乐无忧。”",
+        "willMatch": false
+        }
+    ]
 }
 ```
 ## 左滑或者右滑
