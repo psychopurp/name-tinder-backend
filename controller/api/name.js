@@ -21,6 +21,10 @@ const MODAL_MAP = {
   }
 };
 
+/**
+ * 
+ * @param {type,gender,lastName,friendId} 
+ */
 const getName = async ctx => {
   const {
     type,

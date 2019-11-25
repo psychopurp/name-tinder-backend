@@ -4,6 +4,7 @@ const NameController = require("../controller/api/name");
 const GroupController = require("../controller/api/group");
 const FriendController = require("../controller/api/friend");
 
+///获取名字  type,gender,lastName,friendId
 router.get("/names", NameController.getName);
 
 ///喜欢名字 和获取喜欢的名字  
