@@ -6,13 +6,16 @@ const FriendController = require("../controller/api/friend");
 
 router.get("/names", NameController.getName);
 
+///喜欢名字 和获取喜欢的名字  
 router.post("/likeName", NameController.addLikeName)
 router.get('/LikeName', NameController.getLikeName)
+///获取共同喜欢的名字  
 router.post("/getCommonLikes", NameController.getCommonLikes)
 
-router.post("/group", GroupController.addGroup)
-router.get('/group', GroupController.getGroups)
+// router.post("/group", GroupController.addGroup)
+// router.get('/group', GroupController.getGroups)
 
+///添加好友 
 router.post("/addFriend", FriendController.addFriend)
 // router.put('/name/like', ctx => likeName(ctx))
 

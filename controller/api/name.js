@@ -50,7 +50,10 @@ const getName = async ctx => {
 };
 
 
-
+/**
+ * 添加喜欢的名字
+ * @param {nameId,isLike,lastName} 
+ */
 const addLikeName = async ctx => {
 
   let status;
@@ -92,7 +95,10 @@ const addLikeName = async ctx => {
   };
 }
 
-
+/**
+ * 获取喜欢的名字
+ * @param {token} 
+ */
 const getLikeName = async ctx => {
   let status;
   let msgGlobal = ""

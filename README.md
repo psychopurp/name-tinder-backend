@@ -49,6 +49,17 @@ return :
     data :[]
 }
 
+## 获取喜欢的名字
+url: "/api/likeName"
+method: GET
+data: 
+    
+return :
+{
+    status : bool
+    data :[]
+}
+
 ## 获取共同喜欢的名字
 url: "/api/getCommonLikes"
 method: POST
