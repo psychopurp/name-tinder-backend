@@ -1,6 +1,9 @@
 const request = require('request')
 const Users = require('../../models/Users')
-const { AppID, AppSecret } = require('../../config/config')
+const {
+  AppID,
+  AppSecret
+} = require('../../config/config')
 // const WXBizDataCrypt = require('../../utils/WXBizDataCrypt')
 
 // 获取微信鉴权
@@ -22,20 +25,26 @@ const getWxAuthorization = (code) => {
 }
 
 const wxLogin = async (ctx) => {
-  const { code } = ctx.request.query
+  const {
+    code
+  } = ctx.request.query
   // console.log(code)
   if (!code) ctx.throw(401, 'no jscode')
   try {
     // 微信鉴权
     const data = await getWxAuthorization(code)
     // 更新数据库用户信息
-    await Users.findOneAndUpdate({ openid: data.openid }, data, {
+    await Users.findOneAndUpdate({
+      openid: data.openid
+    }, data, {
       upsert: true,
     })
 
     const user = await Users.findOne({
       openid: data.openid,
-    }).populate({ path: 'student' })
+    }).populate({
+      path: 'student'
+    })
     const student = user.student
     if (student) {
       ctx.session.username = student.username
@@ -44,6 +53,8 @@ const wxLogin = async (ctx) => {
     // 更新 session
     ctx.session.session_key = data.session_key
     ctx.session.openid = data.openid
+    ///我加的
+    ctx.header.token = data.openid
     ctx.body = {
       status: 200,
       message: 'ok',
@@ -55,8 +66,14 @@ const wxLogin = async (ctx) => {
 
 // 更新用户信息：头像、名字、配置等
 const updateUserInfo = async (ctx) => {
-  const { userInfo, config } = ctx.request.fields
-  const { openid, session_key } = ctx.session
+  const {
+    userInfo,
+    config
+  } = ctx.request.fields
+  const {
+    openid,
+    session_key
+  } = ctx.session
 
   const updateData = {}
 
@@ -112,7 +129,10 @@ const updateUserInfo = async (ctx) => {
 
 // 获取用户信息
 const getUserInfo = async (ctx) => {
-  const { openid, session_key } = ctx.session
+  const {
+    openid,
+    session_key
+  } = ctx.session
   if (!(openid && session_key)) {
     ctx.body = {
       data: {

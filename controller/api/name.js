@@ -96,6 +96,7 @@ const getName = async ctx => {
     data = resultSet;
     status = true;
   } catch (error) {
+    ctx.throw(400, error)
     status = false;
     data = error.toString();
     console.log(error);
@@ -153,6 +154,7 @@ const addLikeName = async ctx => {
 
     }
   } catch (error) {
+    ctx.throw(400, e)
     status = false;
     msgGlobal = error.toString()
   }
@@ -198,6 +200,7 @@ const getLikeName = async ctx => {
       msgGlobal = msg
     }
   } catch (error) {
+    ctx.throw(400, e)
     status = false;
     msgGlobal = error.toString()
   }
@@ -251,6 +254,7 @@ const getCommonLikes = async ctx => {
       }
     }
   } catch (error) {
+    ctx.throw(400, e)
     status = false;
     msgGlobal = error.toString()
   }
