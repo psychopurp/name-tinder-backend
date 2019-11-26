@@ -65,16 +65,9 @@ LikesSchema.statics.findOrCreate = async function (userId) {
                 userId
             })
         }
-        return {
-            likes: user,
-            msg: 'ok'
-        };
+        return user
     } catch (error) {
-        console.log(error);
-        return {
-            likes: null,
-            msg: error.toString()
-        };
+        throw error
     }
 };
 
@@ -97,18 +90,10 @@ LikesSchema.methods.addLike = async function (nameId, isLike, lastName = '') {
         } else {
             this.disLikes.addToSet(data)
         }
-        // console.log(this.likes);
         this.save()
-        return {
-            status: true,
-            msg: 'ok'
-        }
+        return true
     } catch (error) {
-        console.log(error);
-        return {
-            status: false,
-            msg: error.toString()
-        }
+        throw error
     }
 };
 
@@ -145,16 +130,10 @@ LikesSchema.methods.getCommonLikes = async function (userId, nameType) {
         let commonLikes = otherLikes.filter((item) => (myLikes.includes(item._id)))
 
         // console.log(otherLikes);
-        return {
-            status: true,
-            data: commonLikes
-        }
+        return commonLikes
+
     } catch (error) {
-        console.log(error);
-        return {
-            status: false,
-            msg: error.toString()
-        }
+        throw error
     }
 };
 

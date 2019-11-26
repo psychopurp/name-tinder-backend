@@ -14,7 +14,7 @@ const UserModel = require("../../models/Users")
  */
 const addFriend = async ctx => {
     let status;
-    let msgGlobal = ""
+    let msg
     let {
         token
     } = ctx.header
@@ -23,28 +23,14 @@ const addFriend = async ctx => {
     } = ctx.request.fields
     let openid = token
     try {
-        result = await UserModel.findByOpenid(openid)
-        if (!result.status) {
-            msgGlobal = result.msg
-            status = result.status
-        } else {
-            ///获取自己
-            let user = result.user
-            // console.log(user);
-            let friends = await FriendModel.findOrCreate(user.id)
-            let resultObject = await friends.addFriend(userId)
-            if (resultObject.status) {
-                status = true
-                msgGlobal = 'ok'
-            } else {
-                status = false
-            }
-        }
+        let user = await UserModel.findByOpenid(openid)
+        let friends = await FriendModel.findOrCreate(user.id)
+        status = await friends.addFriend(userId)
+        msg = 'ok'
     } catch (error) {
+        ctx.throw(400, e)
         status = false;
-        msgGlobal = error.toString()
     }
-    msg = msgGlobal
     ctx.body = {
         status,
         msg,

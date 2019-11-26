@@ -28,9 +28,9 @@ router.post("/addFriend", FriendController.addFriend)
 // router.get('/group/create', ctx => createGroups(ctx))
 // router.get('/group/join', ctx => joinGroup(ctx))
 
-router.get('/wx-login', async (ctx) => wxLogin(ctx))
-router.put('/userinfo', async (ctx) => updateUserInfo(ctx))
-router.get('/userinfo', async (ctx) => getUserInfo(ctx))
+router.get('/user/wx-login', async (ctx) => wxLogin(ctx))
+router.put('/user/userinfo', async (ctx) => updateUserInfo(ctx))
+router.get('/user/userinfo', async (ctx) => getUserInfo(ctx))
 
 // router.get('/group/:id', ctx => getGroupDetail(ctx))
 // router.delete('/group/:id', ctx => exitGroup(ctx))

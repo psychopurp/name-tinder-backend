@@ -68,8 +68,7 @@ FriendSchema.statics.findOrCreate = async function (creatorId) {
         }
         return user
     } catch (error) {
-        console.log(error);
-        return null
+        throw error
     }
 };
 
@@ -82,26 +81,12 @@ FriendSchema.methods.addFriend = async function (userId) {
             this.save()
             ///添加到对方列表
             let friend = await this.model('FriendModel').findOrCreate(userId)
-            if (friend != null) {
-                friend.members.addToSet(this._id)
-                friend.save()
-                return {
-                    status: true,
-                    msg: 'ok'
-                }
-            } else {
-                return {
-                    status: false,
-                    msg: 'add fail to friend'
-                }
-            }
+            friend.members.addToSet(this._id)
+            friend.save()
+            return true
         }
     } catch (error) {
-        console.log(error);
-        return {
-            status: false,
-            msg: error.toString()
-        }
+        throw error
     }
 };
 

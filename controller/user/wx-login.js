@@ -33,6 +33,8 @@ const wxLogin = async (ctx) => {
   try {
     // 微信鉴权
     const data = await getWxAuthorization(code)
+    console.log(data);
+    console.log('...........');
     // 更新数据库用户信息
     await Users.findOneAndUpdate({
       openid: data.openid
