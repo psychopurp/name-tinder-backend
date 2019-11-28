@@ -126,7 +126,9 @@ LikesSchema.methods.getCommonLikes = async function (userId, nameType) {
 
         ])
 
-        let otherLikes = likes[0].likes
+        let otherLikes = []
+        if (likes[0] != null)
+            otherLikes = likes[0].likes
         let commonLikes = otherLikes.filter((item) => (myLikes.includes(item._id)))
 
         // console.log(otherLikes);

@@ -23,6 +23,7 @@ router.post("/getCommonLikes", NameController.getCommonLikes)
 
 ///添加好友 
 router.post("/addFriend", FriendController.addFriend)
+router.get("/getFriends", FriendController.getFriends)
 // router.put('/name/like', ctx => likeName(ctx))
 
 // router.get('/group/create', ctx => createGroups(ctx))

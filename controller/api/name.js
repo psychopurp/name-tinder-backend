@@ -37,12 +37,11 @@ const getName = async ctx => {
   } = ctx.header
   let {
     openid
-  } = ctx.header
-
+  } = ctx.session
+  console.log(ctx.header);
   // let openid = token
   let status;
   let data;
-  console.log(ctx.header);
   try {
     let user = await UserModel.findByOpenid(openid)
     let likeList = await LikesModel.findOrCreate(user.id)
@@ -52,7 +51,13 @@ const getName = async ctx => {
     ///好友喜欢的名字里取出符合条件的
     if (friendId != null) {
       let friendLikeList = (await LikesModel.findOrCreate(friendId)).likes
-      friendLikeList = friendLikeList.filter((item) => (item.gender == gender && item.type == type && !idList.includes(item._id) && item.lastName == lastName))
+      if (type == 0) {
+        ///如果是kzname 就不用lastname
+        friendLikeList = friendLikeList.filter((item) => (item.gender == gender && item.type == type && !idList.includes(item._id)))
+      } else {
+        friendLikeList = friendLikeList.filter((item) => (item.gender == gender && item.type == type && !idList.includes(item._id) && item.lastName == lastName))
+      }
+
       friendLikeList = friendLikeList.map((item) => item.id)
       ///好友喜欢的名字
       friendLikeName = await getNameById(friendLikeList, type)
@@ -138,9 +143,8 @@ const addLikeName = async ctx => {
 
   let status;
   let {
-    token
-  } = ctx.header
-  let openid = token
+    openid
+  } = ctx.session
   let {
     nameId,
     isLike,
@@ -155,7 +159,6 @@ const addLikeName = async ctx => {
     ctx.throw(400, e)
     status = false;
   }
-  msg = msgGlobal
   ctx.body = {
     status,
   };
@@ -204,20 +207,23 @@ const getCommonLikes = async ctx => {
   let status
   let data
   let {
-    token
-  } = ctx.header
+    openid
+  } = ctx.session
   let {
     userId,
     nameType,
     gender
   } = ctx.request.fields
-  let openid = token
+  console.log(ctx.request.fields);
   try {
     let user = await UserModel.findByOpenid(openid)
     let likes = await LikesModel.findOrCreate(user.id)
 
+    // console.log(user.id);
+
     let commonLikes = await likes.getCommonLikes(userId, nameType)
-    data = commonLikes.data.map((item) => ({
+
+    data = commonLikes.map((item) => ({
       nameId: item._id,
       name: item.name,
       type: item.type,
@@ -228,10 +234,9 @@ const getCommonLikes = async ctx => {
 
 
   } catch (error) {
-    ctx.throw(400, e)
+    ctx.throw(400, error)
     status = false;
   }
-  msg = msgGlobal
   ctx.body = {
     status,
     data,
