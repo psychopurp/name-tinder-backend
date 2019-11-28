@@ -2,21 +2,29 @@
 const config = require("../config/config");
 
 const PRODUCTION = process.env.NODE_ENV === "production";
-const DOCKER = process.env.NODE_ENV === "docker";
+const DOCKER = process.env.DOCKER;
+console.log(process.env);
 
 let mongodb = "mongodb://127.0.0.1:27017/name-tinder";
 if (DOCKER) {
-  mongodb = "mongodb://name-mongo:27017/name-tinder";
+  let HOST = process.env.DB_HOST
+  let PORT = process.env.DB_PORT
+  let DB_NAME = process.env.DB_NAME
+  mongodb = `mongodb://${HOST}:${PORT}/${DB_NAME}`;
 }
 console.log(mongodb);
 let sessionSecret = "test";
 
 if (PRODUCTION) {
-  const { mongo } = config;
+  const {
+    mongo
+  } = config;
   mongodb = `mongodb://${mongo.user}:${encodeURIComponent(mongo.password)}@${
     mongo.host
     }:${mongo.port}/${mongo.database}?authSource=${mongo.authSource}`;
-  ({ sessionSecret } = config);
+  ({
+    sessionSecret
+  } = config);
 }
 
 const throwServerError = (ctx, error, message, errorCode = 400) => {
