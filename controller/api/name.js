@@ -26,11 +26,12 @@ const MODAL_MAP = {
  * @param {type,gender,lastName,friendId} 
  */
 const getName = async ctx => {
-  const {
+  let {
     type,
     gender,
     lastName,
-    friendId
+    friendId,
+    isDoubleName
   } = ctx.query;
   let {
     token
@@ -38,15 +39,17 @@ const getName = async ctx => {
   let {
     openid
   } = ctx.session
-  console.log(ctx.header);
+  // console.log(ctx.header);
+  console.log(ctx.query);
   // let openid = token
   let status;
   let data;
   try {
+    isDoubleName = (isDoubleName === 'true')
     let user = await UserModel.findByOpenid(openid)
     let likeList = await LikesModel.findOrCreate(user.id)
     let idList = likeList.likes.map((item) => item.id)
-    let friendLikeName
+
 
     ///好友喜欢的名字里取出符合条件的
     if (friendId != null) {
@@ -67,8 +70,12 @@ const getName = async ctx => {
         gender: item.gender,
         explanation: item.explanation,
         source: item.source,
-        willMatch: true
+        willMatch: true,
+        isDoubleName: item.isDoubleName || false
       }))
+      if (type == 1) {
+        friendLikeName = friendLikeName.filter((item) => item.isDoubleName == isDoubleName)
+      }
     }
 
     let myLikesSet = new Set()
@@ -78,29 +85,48 @@ const getName = async ctx => {
     myLikesSet = Array.from(myLikesSet)
     myLikesSet = myLikesSet.map((item) => new mongoose.Types.ObjectId(item.id)) ///获取id集合
     ///从数据库取的名字 15个
-    let nameList = await MODAL_MAP[type].model.aggregate([{
+
+    let options = [{
+      $match: {
+        gender: {
+          $in: [0, +gender]
+        },
+        _id: {
+          $nin: myLikesSet
+        }
+      }
+    }, {
+      $sample: {
+        size: 15
+      }
+    }]
+    if (type == 1) {
+      options = [{
         $match: {
           gender: {
             $in: [0, +gender]
           },
+          is_double_name: isDoubleName,
           _id: {
             $nin: myLikesSet
           }
         }
-      },
-      {
+      }, {
         $sample: {
           size: 15
         }
-      }
-    ])
+      }]
+    }
+
+    let nameList = await MODAL_MAP[type].model.aggregate(options)
+    // console.log(options)
     nameList = nameList.map((item) => ({
       nameId: item._id,
       name: item.name,
-      gender: item.gender,
+      gender: gender,
       explanation: item.explanation,
       source: item.source,
-      willMatch: false
+      willMatch: false,
     }))
     let resultSet
     ///合并
@@ -151,12 +177,12 @@ const addLikeName = async ctx => {
     lastName
   } = ctx.request.fields
   try {
-    let userData = await UserModel.findByOpenid(openid)
-    let likes = await LikesModel.findOrCreate(userData.user.id)
+    let user = await UserModel.findByOpenid(openid)
+    let likes = await LikesModel.findOrCreate(user.id)
     status = await likes.addLike(nameId, isLike, lastName)
 
   } catch (error) {
-    ctx.throw(400, e)
+    ctx.throw(400, error)
     status = false;
   }
   ctx.body = {
@@ -172,9 +198,8 @@ const getLikeName = async ctx => {
   let status
   let data
   let {
-    token
-  } = ctx.header
-  let openid = token
+    openid
+  } = ctx.session
   try {
     let user = await UserModel.findByOpenid(openid)
     let likes = await LikesModel.findOrCreate(user.id)
@@ -191,7 +216,6 @@ const getLikeName = async ctx => {
     ctx.throw(400, e)
     status = false;
   }
-  msg = msgGlobal
   ctx.body = {
     status,
     data,
