@@ -23,11 +23,15 @@ const addFriend = async ctx => {
     } = ctx.request.fields
     try {
         let user = await UserModel.findByOpenid(openid)
+        console.log(user);
+        console.log(user.id);
         let friends = await FriendModel.findOrCreate(user.id)
+        // console.log('friend')
+        // console.log(friends);
         status = await friends.addFriend(userId)
         msg = 'ok'
     } catch (error) {
-        ctx.throw(400, e)
+        ctx.throw(400, error)
         status = false;
     }
     ctx.body = {

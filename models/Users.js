@@ -54,7 +54,7 @@ const UserSchema = new mongoose.Schema({
   }],
   // 配置
   config: {
-    type: {
+    nameType: {
       type: Number, // 0: KzName 1: ZhName
       required: true,
     },
@@ -63,6 +63,7 @@ const UserSchema = new mongoose.Schema({
       required: true,
     },
     lastName: String, // 姓
+    isDoubleName: Boolean
   },
   // 喜欢的组
   likeGroups: [{
@@ -105,6 +106,7 @@ class UserClass {
   }
 }
 UserSchema.loadClass(UserClass)
+
 UserSchema.statics.findByOpenid = async function (openid) {
   try {
     let user = await this.findOne({

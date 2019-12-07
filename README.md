@@ -118,6 +118,30 @@ return :
     status : bool
 }
 ```
+
+## 获取用户信息 (通过session获取自己信息)
+```
+url: "/api/user"
+method: GET
+
+return :
+{
+    status : bool,
+    data : UserModel
+}
+```
+## 获取用户信息 (通过userId获取他人信息)
+```
+url: "/api/user/getUser"
+method: GET
+data: 
+    userId: str  //好友的id
+return :
+{
+    status : bool,
+    data:
+}
+```
 <!-- router.post("/likeName", NameController.addLikeName)
 router.get('/LikeName', NameController.getLikeName)
 router.post("/getCommonLikes", NameController.getCommonLikes)

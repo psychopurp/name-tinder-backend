@@ -1,6 +1,6 @@
 var a = {
     name: 'elyar',
-    func() {
+    func: function () {
         console.log(this);
     }
 }

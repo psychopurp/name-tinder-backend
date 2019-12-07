@@ -6,7 +6,9 @@ const FriendController = require("../controller/api/friend");
 const {
     wxLogin,
     updateUserInfo,
-    getUserInfo
+    getUserInfo,
+    getUser,
+    getUserById
 } = require('../controller/user/wx-login')
 
 ///获取名字  type,gender,lastName,friendId
@@ -32,6 +34,8 @@ router.get("/getFriends", FriendController.getFriends)
 router.get('/user/wx-login', async (ctx) => wxLogin(ctx))
 router.put('/user/userinfo', async (ctx) => updateUserInfo(ctx))
 router.get('/user/userinfo', async (ctx) => getUserInfo(ctx))
+router.get('/user', async (ctx) => getUser(ctx))
+router.get('/user/getUser', async (ctx) => getUserById(ctx))
 
 // router.get('/group/:id', ctx => getGroupDetail(ctx))
 // router.delete('/group/:id', ctx => exitGroup(ctx))

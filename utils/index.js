@@ -5,7 +5,7 @@ const PRODUCTION = process.env.NODE_ENV === "production";
 const DOCKER = process.env.DOCKER;
 console.log(process.env.DOCKER);
 
-let mongodb = "mongodb://127.0.0.1:27017/name-tinder";
+let mongodb = "mongodb://127.0.0.1:27020/name-tinder";
 if (DOCKER) {
   let HOST = process.env.DB_HOST
   let PORT = process.env.DB_PORT

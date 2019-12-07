@@ -40,20 +40,29 @@ const getName = async ctx => {
     openid
   } = ctx.session
   // console.log(ctx.header);
-  console.log(ctx.query);
+  // console.log(ctx.query);
   // let openid = token
   let status;
   let data;
   try {
     isDoubleName = (isDoubleName === 'true')
     let user = await UserModel.findByOpenid(openid)
-    let likeList = await LikesModel.findOrCreate(user.id)
+    let likeList = await LikesModel.findOne({
+      userId: user.id
+    }, {}, {
+      upsert: true
+    })
+    // console.log(likeList)
     let idList = likeList.likes.map((item) => item.id)
 
 
     ///好友喜欢的名字里取出符合条件的
     if (friendId != null) {
-      let friendLikeList = (await LikesModel.findOrCreate(friendId)).likes
+      let friendLikeList = (await LikesModel.findOne({
+        userId: friendId
+      }, {}, {
+        upsert: true
+      })).likes
       if (type == 0) {
         ///如果是kzname 就不用lastname
         friendLikeList = friendLikeList.filter((item) => (item.gender == gender && item.type == type && !idList.includes(item._id)))

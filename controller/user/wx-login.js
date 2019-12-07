@@ -55,8 +55,7 @@ const wxLogin = async (ctx) => {
     // 更新 session
     ctx.session.session_key = data.session_key
     ctx.session.openid = data.openid
-    ///我加的
-    ctx.header.token = data.openid
+
     ctx.body = {
       status: 200,
       message: 'ok',
@@ -164,8 +163,56 @@ const getUserInfo = async (ctx) => {
   }
 }
 
+
+const getUser = async ctx => {
+  let {
+    openid
+  } = ctx.session
+  let data, status
+  try {
+    let user = await Users.findByOpenid(openid)
+    data = user
+    status = true
+  } catch (error) {
+    ctx.throw(400, error.toString())
+  }
+
+  ctx.body = {
+    data,
+    status
+  }
+}
+
+const getUserById = async ctx => {
+  let {
+    userId
+  } = ctx.query
+  let data, status
+  try {
+    // console.log(userId);
+    let user = await Users.findById(userId)
+    // console.log(user)
+    data = {
+      userInfo: user.userInfo,
+      userId: user._id,
+      userConfig: user.config
+    }
+    status = true
+  } catch (error) {
+    ctx.throw(400, error.toString())
+  }
+
+  ctx.body = {
+    data,
+    status
+  }
+
+}
+
 module.exports = {
   wxLogin,
   updateUserInfo,
   getUserInfo,
+  getUser,
+  getUserById
 }
