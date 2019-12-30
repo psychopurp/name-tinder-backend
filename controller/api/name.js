@@ -47,22 +47,15 @@ const getName = async ctx => {
   try {
     isDoubleName = (isDoubleName === 'true')
     let user = await UserModel.findByOpenid(openid)
-    let likeList = await LikesModel.findOne({
-      userId: user.id
-    }, {}, {
-      upsert: true
-    })
+    let likeList = await LikesModel.findOrCreate(user.id)
     // console.log(likeList)
     let idList = likeList.likes.map((item) => item.id)
 
 
     ///好友喜欢的名字里取出符合条件的
     if (friendId != null) {
-      let friendLikeList = (await LikesModel.findOne({
-        userId: friendId
-      }, {}, {
-        upsert: true
-      })).likes
+      let friendLikeList = (await LikesModel.findOrCreate(friendId)).likes
+      let friendInfo = (await UserModel.findById(friendId)).userInfo
       if (type == 0) {
         ///如果是kzname 就不用lastname
         friendLikeList = friendLikeList.filter((item) => (item.gender == gender && item.type == type && !idList.includes(item._id)))
@@ -72,7 +65,7 @@ const getName = async ctx => {
 
       friendLikeList = friendLikeList.map((item) => item.id)
       ///好友喜欢的名字
-      friendLikeName = await getNameById(friendLikeList, type)
+      friendLikeName = (await getNameById(friendLikeList, type)).filter((item) => item.is_double_name == isDoubleName)
       friendLikeName = getArrayItems(friendLikeName, 5).map((item) => ({
         nameId: item._id,
         name: item.name,
@@ -80,7 +73,8 @@ const getName = async ctx => {
         explanation: item.explanation,
         source: item.source,
         willMatch: true,
-        isDoubleName: item.isDoubleName || false
+        isDoubleName: item.is_double_name,
+        friendInfo: friendInfo
       }))
       if (type == 1) {
         friendLikeName = friendLikeName.filter((item) => item.isDoubleName == isDoubleName)
@@ -98,7 +92,7 @@ const getName = async ctx => {
     let options = [{
       $match: {
         gender: {
-          $in: [0, +gender]
+          $in: [+gender]
         },
         _id: {
           $nin: myLikesSet
@@ -132,10 +126,12 @@ const getName = async ctx => {
     nameList = nameList.map((item) => ({
       nameId: item._id,
       name: item.name,
-      gender: gender,
+      gender: gender == '1' ? 1 : 2,
       explanation: item.explanation,
       source: item.source,
       willMatch: false,
+      isDoubleName: item.is_double_name
+
     }))
     let resultSet
     ///合并
