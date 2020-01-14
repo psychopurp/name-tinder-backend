@@ -3,6 +3,7 @@ const router = require("koa-router")();
 const NameController = require("../controller/api/name");
 const GroupController = require("../controller/api/group");
 const FriendController = require("../controller/api/friend");
+const VoteController = require("../controller/api/vote")
 const {
     wxLogin,
     updateUserInfo,
@@ -40,5 +41,11 @@ router.get('/user/getUser', async (ctx) => getUserById(ctx))
 // router.get('/group/:id', ctx => getGroupDetail(ctx))
 // router.delete('/group/:id', ctx => exitGroup(ctx))
 // router.get('/groups', ctx => getGroups(ctx))
+
+
+router.post('/vote/addVote', VoteController.addVote)
+router.get('/vote', VoteController.getVotes)
+router.post('/vote/delVote', VoteController.delVote)
+router.post('/vote', VoteController.vote)
 
 module.exports = router;
