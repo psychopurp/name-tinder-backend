@@ -142,9 +142,37 @@ return :
     data:
 }
 ```
-<!-- router.post("/likeName", NameController.addLikeName)
-router.get('/LikeName', NameController.getLikeName)
-router.post("/getCommonLikes", NameController.getCommonLikes)
 
-router.post("/group", GroupController.addGroup)
-router.get('/group', GroupController.getGroups) -->
+## 创建投票
+```
+url: "/api/vote/addVote"
+method: POST
+data: 
+    names : [nameId]
+return :
+{
+    status : bool
+    msg : str
+    data :{voteId: "5e2565cde74e4447d03867e2"}
+}
+```
+
+## 获取投票
+```
+url: "/api/vote"
+method: GET
+param: 
+    voteId : str #如果不传则返回用户自己的投票列表
+return :
+{
+    status : bool
+    data :{
+        createdAt: "2020-01-21T01:57:15.653Z"
+        members: []
+        names: (2) [{…}, {…}]
+        userInfo: {nickName: "Elyar~", gender: "1", language: "en", city: "", province: "", …}
+        voteId: "5e265a7b8a2ed24bd2c881f8"
+    }
+    
+}
+```

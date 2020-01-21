@@ -10,10 +10,11 @@ const LikesModel = require("../../models/LikesModel")
 /**
  * 添加投票
  * @param {names} 
+ * @return {voteId}
  * 
  */
 const addVote = async ctx => {
-    let status;
+    let status=true,data;
     let msg
     let {
         openid
@@ -24,10 +25,9 @@ const addVote = async ctx => {
     try {
         let user = await UserModel.findByOpenid(openid)
         let likeList = await LikesModel.findOrCreate(user.id)
-        names = likeList.filter((item) => (names.includes(item._id)))
-        let Vote = await VotesModel.addVote(user.id, names)
-
-        status = await friends.addFriend(userId)
+        names = likeList.likes.filter((item) => (names.includes(item.id)))
+        let vote = await VotesModel.addVote(user.id, names)
+        data={voteId:vote.id}
         msg = 'ok'
     } catch (error) {
         ctx.throw(400, error)
@@ -36,7 +36,8 @@ const addVote = async ctx => {
     ctx.body = {
         status,
         msg,
-        vote
+        data
+        
     };
 }
 
@@ -71,7 +72,7 @@ const delVote = async ctx => {
         data = Array.from(userSet)
 
 
-    } catch (error) {
+    } catch (e) {
         ctx.throw(400, e)
         status = false;
     }
@@ -133,23 +134,41 @@ const vote = async ctx => {
 
 /**
  * 获取自己的投票
- * @param
+ * 如果用户不传voteId ，则返回用户自己的投票
+ * @param {voteId or userId}
  */
 const getVotes = async ctx => {
     let {
         openid
     } = ctx.session
-
-    let data = null
+    let {
+        voteId
+    } = ctx.query
+    let data;
     let status = true
     try {
-        let user = await UserModel.findByOpenid(openid)
-        let votes = await VotesModel.find({
-            userId: user.id
-        })
-        data = votes
+        let votes
+        if(!voteId){
+            let user = await UserModel.findByOpenid(openid)
+             votes=await VotesModel.find({userId:user.id}).populate({path:'userId',select:'userInfo'})
+             data=votes.map(item=>({voteId:item.id,
+                createdAt:item.createdAt,
+                members:item.members,
+                names:item.names,
+                userInfo:item.userId.userInfo}))
+        }else{
+         votes = await VotesModel.findById(voteId).populate({path:'userId',select:'userInfo',options:{ $project : { userId : 1 } } })
+         data={
+            voteId:votes.id,
+            createdAt:votes.createdAt,
+            members:votes.members,
+            names:votes.names,
+            userInfo:votes.userId.userInfo
+        }
+        }
+        
 
-    } catch (error) {
+    } catch (e) {
         ctx.throw(400, e)
         status = false;
     }
