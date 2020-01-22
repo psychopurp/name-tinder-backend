@@ -68,6 +68,33 @@ const getFriends = async ctx => {
 
 
     } catch (error) {
+        ctx.throw(400, error)
+        status = false;
+    }
+    ctx.body = {
+        status,
+        data,
+    };
+
+}
+
+/**
+ * 删除好友
+ * @param {userId} 
+ */
+const delFriends = async ctx => {
+    let {
+        openid
+    } = ctx.session
+    let {
+        userId,
+    } = ctx.request.fields
+    let data
+    let status = true
+    try {
+        let user = await UserModel.findByOpenid(openid)
+        let friends = await FriendModel.findByIdAndUpdate(user.id,{$pull:{members:{_id:userId}}})
+    } catch (e) {
         ctx.throw(400, e)
         status = false;
     }
@@ -77,7 +104,9 @@ const getFriends = async ctx => {
     };
 
 }
+
 module.exports = {
     addFriend,
-    getFriends
+    getFriends,
+    delFriends
 };

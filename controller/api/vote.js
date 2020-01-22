@@ -50,28 +50,13 @@ const delVote = async ctx => {
         openid
     } = ctx.session
     let {
-        voteId
+        voteId,
     } = ctx.request.fields
-
-    let data = null
+    let data
     let status = true
     try {
-        let vote = await VotesModel.findById(voteId)
-        let friends = await FriendModel.findOrCreate(user.id)
-        let userSet = new Set()
-        for await (let item of friends.members) {
-            let friend = await UserModel.findById(item);
-            console.log(friend.userInfo);
-            userSet.add({
-                userId: item,
-                name: friend.userInfo.nickName,
-                gender: friend.userInfo.gender,
-                avatar: friend.userInfo.avatarUrl
-            })
-        }
-        data = Array.from(userSet)
-
-
+        let resutl = await VotesModel.remove({_id:voteId})
+        data=resutl
     } catch (e) {
         ctx.throw(400, e)
         status = false;
@@ -80,7 +65,6 @@ const delVote = async ctx => {
         status,
         data,
     };
-
 }
 
 /**

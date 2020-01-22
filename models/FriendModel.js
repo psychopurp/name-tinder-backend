@@ -23,15 +23,10 @@ const Schema = mongoose.Schema
 const ChildSchema = new Schema({
     _id: {
         type: Schema.Types.ObjectId,
-        refPath: 'commonLikes.model',
+        refPath: 'Users',
         required: true,
         index: true
     },
-    name: String,
-    gender: Number, // 0: 男女 1：男 2：女
-    type: Number, // 0: KzName 1: ZhName
-    lastName: String,
-    model: String,
     createdAt: {
         type: Date,
         default: Date.now
@@ -44,10 +39,7 @@ const FriendSchema = new mongoose.Schema({
         required: true,
         ref: "Users"
     },
-    members: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Users'
-    }],
+    members: [ChildSchema],
     // commonLikes: [
     //     ChildSchema
     // ],
