@@ -85,6 +85,7 @@ const vote = async ctx => {
     try {
         let user = await UserModel.findByOpenid(openid)
         let vote = await VotesModel.findById(voteId)
+      
         if(vote.userId==user.id){
             status=false
             data="不能给自己投票"
@@ -144,7 +145,7 @@ const getVotes = async ctx => {
             let members= votes.names[i].members.map((k)=>{
                 if(k._id._id.toString()==user.id){
                     index=i
-                    console.log('---------'+index);
+                    // console.log('---------'+index);
                 }
                 return {
                 userId:k._id._id,
@@ -166,7 +167,7 @@ const getVotes = async ctx => {
             //  console.log(members);
             //  names.mem=members
             //  names[i].idx=index
-             console.log(names);
+            //  console.log(names);
          }
        
         // console.log(names[0].members);
