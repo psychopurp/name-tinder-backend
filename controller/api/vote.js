@@ -85,24 +85,17 @@ const vote = async ctx => {
     try {
         let user = await UserModel.findByOpenid(openid)
         let vote = await VotesModel.findById(voteId)
-
-        vote.members.addToSet(user.id)
-
-        let friends = await FriendModel.findOrCreate(user.id)
-        let userSet = new Set()
-        for await (let item of friends.members) {
-            let friend = await UserModel.findById(item);
-            console.log(friend.userInfo);
-            userSet.add({
-                userId: item,
-                name: friend.userInfo.nickName,
-                gender: friend.userInfo.gender,
-                avatar: friend.userInfo.avatarUrl
-            })
-        }
-        data = Array.from(userSet)
-
-
+        if(vote.userId==user.id){
+            status=false
+            data="不能给自己投票"
+        }else{
+        // let vote = await VotesModel.findByIdAndUpdate(voteId,{$addToSet:{members:{_id:user.id}}})
+        let name=vote.names.id(nameId)
+        
+        name.members.addToSet(user.id)
+        name.voteNum=name.members.length
+        vote.save()
+        data=name}
     } catch (error) {
         ctx.throw(400, error)
         status = false;
@@ -141,13 +134,51 @@ const getVotes = async ctx => {
                 names:item.names,
                 userInfo:item.userId.userInfo}))
         }else{
-         votes = await VotesModel.findById(voteId).populate({path:'userId',select:'userInfo',options:{ $project : { userId : 1 } } })
+        let user = await UserModel.findByOpenid(openid)
+         votes = await VotesModel.findById(voteId).populate({path:'userId',select:'userInfo ',options:{ $project : { userId : 1 } } }).populate('names.members._id','userInfo')
+         
+         let index=-1
+    
+         let names=[]
+         for (let i = 0; i < votes.names.length; i++) {
+            let members= votes.names[i].members.map((k)=>{
+                if(k._id._id.toString()==user.id){
+                    index=i
+                    console.log('---------'+index);
+                }
+                return {
+                userId:k._id._id,
+                userInfo:k._id.userInfo
+             } })
+             let name=votes.names[i]
+             names.push({
+                 voteNum:name.voteNum,
+                 members:members,
+                 createdAt:name.createdAt,
+                 type:name.type,
+                 name:name.name,
+                 gender:name.gender,
+                 model:name.model,
+                 _id:name._id,
+                 lastName:name.lastName,
+                 index:index
+             })
+            //  console.log(members);
+            //  names.mem=members
+            //  names[i].idx=index
+             console.log(names);
+         }
+       
+        // console.log(names[0].members);
          data={
+             voted:index!=-1?true:false,
+             index:index,
             voteId:votes.id,
             createdAt:votes.createdAt,
             members:votes.members,
-            names:votes.names,
-            userInfo:votes.userId.userInfo
+            names:names,
+            userInfo:votes.userId.userInfo,
+            userId:user.id
         }
         }
         

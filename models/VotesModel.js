@@ -27,6 +27,11 @@ const ChildSchema = new Schema({
         required: true,
         index: true
     },
+    members:[{_id:{
+        type: Schema.Types.ObjectId,
+        ref: 'Users',
+        index:true,
+    }}],
 
     name: String,
     gender: Number, // 0: 男女 1：男 2：女
@@ -50,10 +55,11 @@ const VotesSchema = new mongoose.Schema({
         ref: "Users"
     },
     ///参与投票的成员
-    members: [{
-        type: Schema.Types.ObjectId,
-        ref: 'Users'
-    }],
+    // members: [{_id:{
+    //     type: Schema.Types.ObjectId,
+    //     ref: 'Users',
+    //     index:true,
+    // }}],
     names: [
         ChildSchema
     ],
@@ -87,7 +93,7 @@ VotesSchema.statics.addVote = async function (userId, names, expires = Date.now)
         expires=Date.now
         let vote = await this.create({
             userId: userId,
-            members: [],
+            // members: [],
             names: names,
             // expires: expires
         })
