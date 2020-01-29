@@ -154,7 +154,7 @@ const getVotes = async ctx => {
                     }
                 })
                 .populate("names.members._id", "userInfo");
-            // let user = {
+            //  user = {
             //     id: "5cf09c65f7cd503d63d3f597"
             // };
             //  let index=-1
@@ -192,7 +192,7 @@ const getVotes = async ctx => {
                 //  console.log(names);
             }
 
-            // console.log(names[0].members);
+            console.log(votes);
             data = {
                 voted: voted,
                 //  index:index,
@@ -201,7 +201,8 @@ const getVotes = async ctx => {
                 members: votes.members,
                 names: names,
                 userInfo: votes.userId.userInfo,
-                userId: user.id
+                userId:votes.userId._id,
+                itSelf:votes.userId._id.toString()==user.id.toString()
             };
         }
     } catch (e) {
